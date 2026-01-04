@@ -1,3 +1,5 @@
+import PlacesList from "./PlacesList.jsx";
+
 export default function Places({
   title,
   places,
@@ -17,16 +19,7 @@ export default function Places({
       )}
 
       {!isLoading && places.length > 0 && (
-        <ul className="places">
-          {places.map((place) => (
-            <li key={place.id} className="place-item">
-              <button onClick={() => onSelectPlace(place)}>
-                <img src={place.imageUrl} alt={place.imageAlt} />
-                <h3>{place.title}</h3>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <PlacesList places={places} onSelectPlace={onSelectPlace} />
       )}
     </section>
   );
