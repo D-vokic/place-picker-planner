@@ -2,15 +2,13 @@ const API_BASE_URL = "http://localhost:3000";
 
 async function request(url, options = {}) {
   const response = await fetch(API_BASE_URL + url, {
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     ...options,
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Request failed.");
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Request failed");
   }
 
   return response.json();
@@ -24,12 +22,17 @@ export function fetchUserPlaces() {
   return request("/user-places");
 }
 
-export async function addUserPlace(place) {
-  const data = await request("/user-places", {
+export function addUserPlace(place) {
+  return request("/user-places", {
     method: "POST",
     body: JSON.stringify({ place }),
   });
-  return data.place;
+}
+
+export function togglePlaceStatus(placeId) {
+  return request(`/user-places/${placeId}`, {
+    method: "PATCH",
+  });
 }
 
 export function removeUserPlace(placeId) {

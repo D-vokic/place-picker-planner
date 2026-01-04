@@ -5,6 +5,7 @@ export default function Places({
   places,
   fallbackText,
   onSelectPlace,
+  onToggleStatus,
   isLoading = false,
   loadingText = "Loading...",
 }) {
@@ -19,7 +20,11 @@ export default function Places({
       )}
 
       {!isLoading && places.length > 0 && (
-        <PlacesList places={places} onSelectPlace={onSelectPlace} />
+        <PlacesList
+          places={places}
+          onSelectPlace={onSelectPlace}
+          onToggleStatus={onToggleStatus}
+        />
       )}
     </section>
   );

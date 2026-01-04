@@ -1,10 +1,20 @@
-export default function PlaceItem({ place, onSelectPlace }) {
+export default function PlaceItem({ place, onSelectPlace, onToggleStatus }) {
   return (
     <li className="place-item">
-      <button onClick={() => onSelectPlace(place)}>
+      <button className="place-image" onClick={() => onSelectPlace(place)}>
         <img src={place.imageUrl} alt={place.imageAlt} />
-        <h3>{place.title}</h3>
       </button>
+
+      <h3 className="place-title">{place.title}</h3>
+
+      {onToggleStatus && (
+        <button
+          className="status-toggle"
+          onClick={() => onToggleStatus(place.id)}
+        >
+          {place.status === "visited" ? "Visited" : "Want to visit"}
+        </button>
+      )}
     </li>
   );
 }

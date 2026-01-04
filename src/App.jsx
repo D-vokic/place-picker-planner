@@ -5,7 +5,12 @@ import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
 import logoImg from "./assets/logoImg.svg";
 import AvailablePlaces from "./components/AvailablePlaces.jsx";
-import { fetchUserPlaces, addUserPlace, removeUserPlace } from "./utils/api.js";
+import {
+  fetchUserPlaces,
+  addUserPlace,
+  removeUserPlace,
+  togglePlaceStatus,
+} from "./utils/api.js";
 
 function App() {
   const selectedPlace = useRef(null);
@@ -39,22 +44,38 @@ function App() {
   }
 
   async function handleSelectPlace(place) {
-    // optimistic add (no duplicates)
     setUserPlaces((prev) => {
       if (prev.some((p) => p.id === place.id)) return prev;
-      return [place, ...prev];
+      return [{ ...place, status: "want" }, ...prev];
     });
 
     try {
-      const persistedPlace = await addUserPlace(place);
-      // ensure UI reflects backend-confirmed data
-      setUserPlaces((prev) => {
-        const withoutTemp = prev.filter((p) => p.id !== place.id);
-        return [persistedPlace, ...withoutTemp];
-      });
+      await addUserPlace(place);
     } catch {
-      // rollback
       setUserPlaces((prev) => prev.filter((p) => p.id !== place.id));
+    }
+  }
+
+  async function handleToggleStatus(placeId) {
+    // optimistic UI toggle
+    setUserPlaces((prev) =>
+      prev.map((p) =>
+        p.id === placeId
+          ? { ...p, status: p.status === "visited" ? "want" : "visited" }
+          : p
+      )
+    );
+
+    try {
+      await togglePlaceStatus(placeId);
+    } catch {
+      // rollback by refetching persisted state
+      try {
+        const data = await fetchUserPlaces();
+        setUserPlaces(data.places);
+      } catch {
+        // ignore
+      }
     }
   }
 
@@ -63,16 +84,13 @@ function App() {
 
     const placeId = selectedPlace.current.id;
 
-    // optimistic remove
-    setUserPlaces((prev) => prev.filter((place) => place.id !== placeId));
-
+    setUserPlaces((prev) => prev.filter((p) => p.id !== placeId));
     setModalIsOpen(false);
     selectedPlace.current = null;
 
     try {
       await removeUserPlace(placeId);
     } catch {
-      // rollback by refetching persisted state
       try {
         const data = await fetchUserPlaces();
         setUserPlaces(data.places);
@@ -105,6 +123,7 @@ function App() {
           loadingText="Loading your places..."
           fallbackText="You have not added any places yet."
           onSelectPlace={handleStartRemovePlace}
+          onToggleStatus={handleToggleStatus}
         />
 
         <AvailablePlaces onSelectPlace={handleSelectPlace} />
