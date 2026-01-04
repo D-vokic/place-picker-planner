@@ -9,21 +9,28 @@ export default function Places({
   isLoading = false,
   loadingText = "Loading...",
 }) {
+  const hasPlaces = places.length > 0;
+
   return (
     <section className="places-category">
       <h2>{title}</h2>
 
-      {isLoading && <p className="fallback-text">{loadingText}</p>}
+      {isLoading && (
+        <p className="fallback-text" aria-busy="true">
+          {loadingText}
+        </p>
+      )}
 
-      {!isLoading && places.length === 0 && (
+      {!isLoading && !hasPlaces && (
         <p className="fallback-text">{fallbackText}</p>
       )}
 
-      {!isLoading && places.length > 0 && (
+      {!isLoading && hasPlaces && (
         <PlacesList
           places={places}
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}
+          disabled={isLoading}
         />
       )}
     </section>
