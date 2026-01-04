@@ -48,6 +48,29 @@ header p {
   color: #9eb5b4;
 }
 
+header input[type="email"] {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  width: 100%;
+  max-width: 22rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #defaf8;
+  background-color: #1f1c2c;
+  border: 2px solid #0d373e;
+  border-radius: 6px;
+  outline: none;
+}
+
+header input[type="email"]::placeholder {
+  color: #9eb5b4;
+}
+
+header input[type="email"]:focus {
+  border-color: #8feeff;
+  box-shadow: 0 0 0 2px rgba(143, 238, 255, 0.25);
+}
+
 .places-category {
   margin: 1.5rem auto;
   padding: 1rem;
