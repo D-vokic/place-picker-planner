@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import ErrorPage from "./ErrorPage.jsx";
 
 export default function AvailablePlaces({ onSelectPlace }) {
-  // TODO: Fetching available places from backend API, and handling errors
   const [isFetching, setIsFetching] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [error, setError] = useState();
@@ -22,7 +21,6 @@ export default function AvailablePlaces({ onSelectPlace }) {
 
         setAvailablePlaces(resData.places);
       } catch (error) {
-        // handle the error
         setError({
           message:
             error.message || "Could not fetch places, please try again later.",

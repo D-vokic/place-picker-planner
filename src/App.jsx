@@ -3,7 +3,6 @@ import { useRef, useState, useCallback } from "react";
 import Places from "./components/Places.jsx";
 import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
-// import logoImg from "./assets/logo.png";
 import logoImg from "./assets/logoImg.svg";
 import AvailablePlaces from "./components/AvailablePlaces.jsx";
 
@@ -55,16 +54,12 @@ function App() {
       <header>
         <img src={logoImg} alt="Place Picker Planner logo" />
         <h1>Place Picker Planner</h1>
-        <p>
-          Your personal map of favorite places.
-          <br />
-          Save the places that matter to you.
-        </p>
+        <p>Save and organize places you want to visit.</p>
       </header>
       <main>
         <Places
-          title="Pick. Save. Goooo..."
-          fallbackText="Select the places you would like to visit below."
+          title="My Places"
+          fallbackText="You have not added any places yet."
           places={userPlaces}
           onSelectPlace={handleStartRemovePlace}
         />
