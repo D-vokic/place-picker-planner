@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Places from "./Places.jsx";
 import ErrorPage from "./ErrorPage.jsx";
+import CategoryFilter from "./CategoryFilter.jsx";
 import { fetchPlaces } from "../utils/api.js";
 
 export default function AvailablePlaces({ onSelectPlace }) {
   const [isFetching, setIsFetching] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   useEffect(() => {
     async function loadPlaces() {
@@ -40,14 +42,31 @@ export default function AvailablePlaces({ onSelectPlace }) {
     return <ErrorPage title="Failed to load places" message={error} />;
   }
 
+  const categories = useMemo(() => {
+    return Array.from(new Set(availablePlaces.map((place) => place.category)));
+  }, [availablePlaces]);
+
+  const filteredPlaces =
+    selectedCategory === "all"
+      ? availablePlaces
+      : availablePlaces.filter((place) => place.category === selectedCategory);
+
   return (
-    <Places
-      title="Available Places"
-      places={availablePlaces}
-      isLoading={isFetching}
-      loadingText="Fetching places..."
-      fallbackText="No places available."
-      onSelectPlace={onSelectPlace}
-    />
+    <>
+      <CategoryFilter
+        categories={categories}
+        selected={selectedCategory}
+        onChange={setSelectedCategory}
+      />
+
+      <Places
+        title="Available Places"
+        places={filteredPlaces}
+        isLoading={isFetching}
+        loadingText="Fetching places..."
+        fallbackText="No places available."
+        onSelectPlace={onSelectPlace}
+      />
+    </>
   );
 }
