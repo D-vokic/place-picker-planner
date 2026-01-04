@@ -12,11 +12,10 @@ function App() {
 
   const [userPlaces, setUserPlaces] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [isLoadingUserPlaces, setIsLoadingUserPlaces] = useState(false);
+  const [isLoadingUserPlaces, setIsLoadingUserPlaces] = useState(true);
 
   useEffect(() => {
     async function loadUserPlaces() {
-      setIsLoadingUserPlaces(true);
       try {
         const data = await fetchUserPlaces();
         setUserPlaces(data.places);

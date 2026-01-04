@@ -5,8 +5,8 @@ export default function Places({
   places,
   fallbackText,
   onSelectPlace,
-  isLoading,
-  loadingText,
+  isLoading = false,
+  loadingText = "Loading...",
 }) {
   return (
     <section className="places-category">
