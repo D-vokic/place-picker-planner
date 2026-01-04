@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useReducer } from "react";
 
 import Places from "./components/Places.jsx";
 import Modal from "./components/Modal.jsx";
@@ -12,67 +12,167 @@ import {
   togglePlaceStatus,
 } from "./utils/api.js";
 
+/* ------------------------------------------------------------------ */
+/* Reducer & initial state */
+/* ------------------------------------------------------------------ */
+
+const initialState = {
+  userPlaces: [],
+  isLoadingUserPlaces: true,
+  modalIsOpen: false,
+};
+
+function placesReducer(state, action) {
+  switch (action.type) {
+    case "LOAD_USER_PLACES": {
+      return {
+        ...state,
+        userPlaces: action.places,
+        isLoadingUserPlaces: false,
+      };
+    }
+
+    case "OPEN_DELETE_MODAL": {
+      return {
+        ...state,
+        modalIsOpen: true,
+      };
+    }
+
+    case "CLOSE_DELETE_MODAL": {
+      return {
+        ...state,
+        modalIsOpen: false,
+      };
+    }
+
+    case "ADD_PLACE_OPTIMISTIC": {
+      if (state.userPlaces.some((p) => p.id === action.place.id)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        userPlaces: [{ ...action.place, status: "want" }, ...state.userPlaces],
+      };
+    }
+
+    case "REMOVE_PLACE_OPTIMISTIC": {
+      return {
+        ...state,
+        userPlaces: state.userPlaces.filter((p) => p.id !== action.placeId),
+      };
+    }
+
+    case "TOGGLE_STATUS_OPTIMISTIC": {
+      return {
+        ...state,
+        userPlaces: state.userPlaces.map((p) =>
+          p.id === action.placeId
+            ? {
+                ...p,
+                status: p.status === "visited" ? "want" : "visited",
+              }
+            : p
+        ),
+      };
+    }
+
+    case "SYNC_USER_PLACES": {
+      return {
+        ...state,
+        userPlaces: action.places,
+      };
+    }
+
+    default:
+      return state;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* App */
+/* ------------------------------------------------------------------ */
+
 function App() {
   const selectedPlace = useRef(null);
+  const [state, dispatch] = useReducer(placesReducer, initialState);
 
-  const [userPlaces, setUserPlaces] = useState([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [isLoadingUserPlaces, setIsLoadingUserPlaces] = useState(true);
+  const { userPlaces, isLoadingUserPlaces, modalIsOpen } = state;
+
+  /* ---------------------------------------------------------------- */
+  /* Effects */
+  /* ---------------------------------------------------------------- */
 
   useEffect(() => {
     async function loadUserPlaces() {
       try {
         const data = await fetchUserPlaces();
-        setUserPlaces(data.places);
+        dispatch({
+          type: "LOAD_USER_PLACES",
+          places: data.places,
+        });
       } catch {
-        setUserPlaces([]);
+        dispatch({
+          type: "LOAD_USER_PLACES",
+          places: [],
+        });
       }
-      setIsLoadingUserPlaces(false);
     }
 
     loadUserPlaces();
   }, []);
 
+  /* ---------------------------------------------------------------- */
+  /* Handlers */
+  /* ---------------------------------------------------------------- */
+
   function handleStartRemovePlace(place) {
     selectedPlace.current = place;
-    setModalIsOpen(true);
+    dispatch({ type: "OPEN_DELETE_MODAL" });
   }
 
   function handleStopRemovePlace() {
     selectedPlace.current = null;
-    setModalIsOpen(false);
+    dispatch({ type: "CLOSE_DELETE_MODAL" });
   }
 
   async function handleSelectPlace(place) {
-    setUserPlaces((prev) => {
-      if (prev.some((p) => p.id === place.id)) return prev;
-      return [{ ...place, status: "want" }, ...prev];
+    dispatch({
+      type: "ADD_PLACE_OPTIMISTIC",
+      place,
     });
 
     try {
       await addUserPlace(place);
     } catch {
-      setUserPlaces((prev) => prev.filter((p) => p.id !== place.id));
+      try {
+        const data = await fetchUserPlaces();
+        dispatch({
+          type: "SYNC_USER_PLACES",
+          places: data.places,
+        });
+      } catch {
+        // ignore
+      }
     }
   }
 
   async function handleToggleStatus(placeId) {
-    // optimistic UI toggle
-    setUserPlaces((prev) =>
-      prev.map((p) =>
-        p.id === placeId
-          ? { ...p, status: p.status === "visited" ? "want" : "visited" }
-          : p
-      )
-    );
+    dispatch({
+      type: "TOGGLE_STATUS_OPTIMISTIC",
+      placeId,
+    });
 
     try {
       await togglePlaceStatus(placeId);
     } catch {
-      // rollback by refetching persisted state
       try {
         const data = await fetchUserPlaces();
-        setUserPlaces(data.places);
+        dispatch({
+          type: "SYNC_USER_PLACES",
+          places: data.places,
+        });
       } catch {
         // ignore
       }
@@ -84,8 +184,12 @@ function App() {
 
     const placeId = selectedPlace.current.id;
 
-    setUserPlaces((prev) => prev.filter((p) => p.id !== placeId));
-    setModalIsOpen(false);
+    dispatch({
+      type: "REMOVE_PLACE_OPTIMISTIC",
+      placeId,
+    });
+
+    dispatch({ type: "CLOSE_DELETE_MODAL" });
     selectedPlace.current = null;
 
     try {
@@ -93,12 +197,19 @@ function App() {
     } catch {
       try {
         const data = await fetchUserPlaces();
-        setUserPlaces(data.places);
+        dispatch({
+          type: "SYNC_USER_PLACES",
+          places: data.places,
+        });
       } catch {
         // ignore
       }
     }
   }, []);
+
+  /* ---------------------------------------------------------------- */
+  /* Render */
+  /* ---------------------------------------------------------------- */
 
   return (
     <>
