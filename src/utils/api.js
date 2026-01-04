@@ -1,7 +1,11 @@
 const API_BASE_URL = "http://localhost:3000";
 
-async function request(url, options = {}) {
-  const response = await fetch(API_BASE_URL + url, {
+/* ------------------------------------------------------------------ */
+/* Low-level HTTP helper */
+/* ------------------------------------------------------------------ */
+
+async function request(endpoint, options = {}) {
+  const response = await fetch(API_BASE_URL + endpoint, {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
@@ -14,29 +18,42 @@ async function request(url, options = {}) {
   return response.json();
 }
 
+/* ------------------------------------------------------------------ */
+/* Endpoints */
+/* ------------------------------------------------------------------ */
+
+const ENDPOINTS = {
+  PLACES: "/places",
+  USER_PLACES: "/user-places",
+};
+
+/* ------------------------------------------------------------------ */
+/* Business / domain API */
+/* ------------------------------------------------------------------ */
+
 export function fetchPlaces() {
-  return request("/places");
+  return request(ENDPOINTS.PLACES);
 }
 
 export function fetchUserPlaces() {
-  return request("/user-places");
+  return request(ENDPOINTS.USER_PLACES);
 }
 
 export function addUserPlace(place) {
-  return request("/user-places", {
+  return request(ENDPOINTS.USER_PLACES, {
     method: "POST",
     body: JSON.stringify({ place }),
   });
 }
 
 export function togglePlaceStatus(placeId) {
-  return request(`/user-places/${placeId}`, {
+  return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
     method: "PATCH",
   });
 }
 
 export function removeUserPlace(placeId) {
-  return request(`/user-places/${placeId}`, {
+  return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
     method: "DELETE",
   });
 }
