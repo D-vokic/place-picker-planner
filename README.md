@@ -52,6 +52,8 @@ node app.js
 
 The frontend and backend servers must be running simultaneously for the application to work correctly.
 
+---
+
 ## Project Goals
 
 - Build a complete, real-world React application
