@@ -255,6 +255,26 @@ select:focus {
   box-shadow: 0 0 6px rgba(143, 238, 255, 0.4);
 }
 
+input[type="text"] {
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  width: 20rem;
+  max-width: 90%;
+  font-family: inherit;
+  font-size: 0.95rem;
+
+  color: #defaf8;
+  background-color: #1f1c2c;
+  border: 2px solid #0d373e;
+  border-radius: 6px;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #8feeff;
+  box-shadow: 0 0 6px rgba(143, 238, 255, 0.4);
+}
+
 @keyframes slide-down-fade-in {
   from {
     opacity: 0;

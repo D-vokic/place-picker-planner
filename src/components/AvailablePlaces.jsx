@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import Places from "./Places.jsx";
 import ErrorPage from "./ErrorPage.jsx";
 import CategoryFilter from "./CategoryFilter.jsx";
+import SearchInput from "./SearchInput.jsx";
 import { fetchPlaces } from "../utils/api.js";
 
 export default function AvailablePlaces({ onSelectPlace }) {
@@ -9,6 +10,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     async function loadPlaces() {
@@ -46,13 +48,23 @@ export default function AvailablePlaces({ onSelectPlace }) {
     return Array.from(new Set(availablePlaces.map((place) => place.category)));
   }, [availablePlaces]);
 
-  const filteredPlaces =
-    selectedCategory === "all"
-      ? availablePlaces
-      : availablePlaces.filter((place) => place.category === selectedCategory);
+  const filteredPlaces = useMemo(() => {
+    return availablePlaces.filter((place) => {
+      const matchesCategory =
+        selectedCategory === "all" || place.category === selectedCategory;
+
+      const matchesSearch = place.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [availablePlaces, selectedCategory, searchTerm]);
 
   return (
     <>
+      <SearchInput value={searchTerm} onChange={setSearchTerm} />
+
       <CategoryFilter
         categories={categories}
         selected={selectedCategory}
@@ -64,7 +76,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
         places={filteredPlaces}
         isLoading={isFetching}
         loadingText="Fetching places..."
-        fallbackText="No places available."
+        fallbackText="No places match your search."
         onSelectPlace={onSelectPlace}
       />
     </>
