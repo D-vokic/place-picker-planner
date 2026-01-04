@@ -1,0 +1,23 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Place Picker Planner logo" role="img">
+  <!-- Map pin -->
+  <path d="M32 4
+       C21.5 4 13 12.3 13 22.7
+       C13 35.2 32 60 32 60
+       C32 60 51 35.2 51 22.7
+       C51 12.3 42.5 4 32 4Z" fill="none" stroke="#4FD1C5" stroke-width="3"></path>
+
+  <!-- Inner circle -->
+  <circle cx="32" cy="22" r="6" fill="#4FD1C5"></circle>
+
+  <!-- Star -->
+  <path d="M32 17
+       L34 21
+       L38 22
+       L35 25
+       L36 29
+       L32 27
+       L28 29
+       L29 25
+       L26 22
+       L30 21Z" fill="#1A202C"></path>
+</svg>
