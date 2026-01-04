@@ -5,41 +5,52 @@ import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
 import logoImg from "./assets/logoImg.svg";
 import AvailablePlaces from "./components/AvailablePlaces.jsx";
+import { addUserPlace, removeUserPlace } from "./utils/api.js";
 
 function App() {
-  const selectedPlace = useRef();
+  const selectedPlace = useRef(null);
 
   const [userPlaces, setUserPlaces] = useState([]);
-
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   function handleStartRemovePlace(place) {
-    setModalIsOpen(true);
     selectedPlace.current = place;
+    setModalIsOpen(true);
   }
 
   function handleStopRemovePlace() {
     setModalIsOpen(false);
+    selectedPlace.current = null;
   }
 
-  function handleSelectPlace(selectedPlace) {
-    setUserPlaces((prevPickedPlaces) => {
-      if (!prevPickedPlaces) {
-        prevPickedPlaces = [];
-      }
-      if (prevPickedPlaces.some((place) => place.id === selectedPlace.id)) {
-        return prevPickedPlaces;
-      }
-      return [selectedPlace, ...prevPickedPlaces];
-    });
+  async function handleSelectPlace(place) {
+    setUserPlaces((prev) => [place, ...prev]);
+
+    try {
+      await addUserPlace(place);
+    } catch {
+      setUserPlaces((prev) => prev.filter((p) => p.id !== place.id));
+    }
   }
 
-  const handleRemovePlace = useCallback(async function handleRemovePlace() {
-    setUserPlaces((prevPickedPlaces) =>
-      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current.id)
-    );
+  const handleRemovePlace = useCallback(async function () {
+    if (!selectedPlace.current) {
+      setModalIsOpen(false);
+      return;
+    }
+
+    const placeId = selectedPlace.current.id;
+
+    setUserPlaces((prev) => prev.filter((place) => place.id !== placeId));
 
     setModalIsOpen(false);
+    selectedPlace.current = null;
+
+    try {
+      await removeUserPlace(placeId);
+    } catch {
+      // ignore for now
+    }
   }, []);
 
   return (
@@ -56,6 +67,7 @@ function App() {
         <h1>Place Picker Planner</h1>
         <p>Save and organize places you want to visit.</p>
       </header>
+
       <main>
         <Places
           title="My Places"

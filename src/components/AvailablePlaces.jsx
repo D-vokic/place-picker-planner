@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Places from "./Places.jsx";
 import ErrorPage from "./ErrorPage.jsx";
+import { fetchPlaces } from "../utils/api.js";
 
 export default function AvailablePlaces({ onSelectPlace }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -8,22 +9,16 @@ export default function AvailablePlaces({ onSelectPlace }) {
   const [error, setError] = useState();
 
   useEffect(() => {
-    async function fetchPlaces() {
+    async function loadPlaces() {
       setIsFetching(true);
 
       try {
-        const response = await fetch("http://localhost:3000/places");
+        const data = await fetchPlaces();
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch places.");
-        }
-
-        const resData = await response.json();
-
-        const normalizedPlaces = resData.places.map((place) => ({
+        const normalizedPlaces = data.places.map((place) => ({
           id: place.id,
           title: place.title,
-          imageUrl: `http://localhost:3000/${place.image.src}`,
+          imageUrl: `http://localhost:3000/images/${place.image.src}`,
           imageAlt: place.image.alt || place.title,
           city: place.city || "",
           category: place.category || "general",
@@ -32,16 +27,13 @@ export default function AvailablePlaces({ onSelectPlace }) {
 
         setAvailablePlaces(normalizedPlaces);
       } catch (error) {
-        setError({
-          message:
-            error.message || "Could not fetch places. Please try again later.",
-        });
+        setError({ message: error.message });
       }
 
       setIsFetching(false);
     }
 
-    fetchPlaces();
+    loadPlaces();
   }, []);
 
   if (error) {
