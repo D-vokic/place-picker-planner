@@ -11,6 +11,8 @@ This repository represents the initial baseline phase, focused on cleanup, struc
 
 Live demo: https://place-picker-planner.netlify.app/
 
+![Place Picker Planner screenshot](screenshot.png)
+
 ## Project Goals
 
 - Build a complete, real-world React application
