@@ -1,28 +1,17 @@
-import { useEffect } from "react";
-
-const TIMER = 3000;
-
-export default function DeleteConfirmation({ onConfirm, onCancel }) {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onConfirm();
-    }, TIMER);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [onConfirm]);
-
+export default function DeleteConfirmation({ onCancel, onConfirm }) {
   return (
     <div id="delete-confirmation">
-      <h2>Are you sure?</h2>
-      <p>Do you really want to remove this place?</p>
+      <h2>Remove place</h2>
+      <p>
+        Are you sure you want to remove this place from your list? This action
+        cannot be undone.
+      </p>
       <div id="confirmation-actions">
         <button onClick={onCancel} className="button-text">
-          No
+          Cancel
         </button>
         <button onClick={onConfirm} className="button">
-          Yes
+          Remove
         </button>
       </div>
     </div>
