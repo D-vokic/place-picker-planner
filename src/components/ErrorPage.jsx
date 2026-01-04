@@ -1,6 +1,6 @@
-export default function Error({ title, message, onConfirm }) {
+export default function ErrorPage({ title, message, onConfirm }) {
   return (
-    <div className="error">
+    <section className="error center">
       <h2>{title}</h2>
       <p>{message}</p>
       {onConfirm && (
@@ -10,6 +10,6 @@ export default function Error({ title, message, onConfirm }) {
           </button>
         </div>
       )}
-    </div>
+    </section>
   );
 }
