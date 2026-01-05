@@ -1,10 +1,13 @@
 import { useRef, useEffect, useCallback, useReducer, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Places from "./components/Places.jsx";
+import AvailablePlaces from "./components/AvailablePlaces.jsx";
 import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
+import ErrorPage from "./components/ErrorPage.jsx";
+
 import logoImg from "./assets/logoImg.svg";
-import AvailablePlaces from "./components/AvailablePlaces.jsx";
 import {
   fetchUserPlaces,
   addUserPlace,
@@ -38,9 +41,7 @@ function placesReducer(state, action) {
     case "CLOSE_DELETE_MODAL":
       return { ...state, modalIsOpen: false };
     case "ADD_PLACE_OPTIMISTIC":
-      if (state.userPlaces.some((p) => p.id === action.place.id)) {
-        return state;
-      }
+      if (state.userPlaces.some((p) => p.id === action.place.id)) return state;
       return {
         ...state,
         userPlaces: [{ ...action.place, status: "want" }, ...state.userPlaces],
@@ -55,10 +56,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: state.userPlaces.map((p) =>
           p.id === action.placeId
-            ? {
-                ...p,
-                status: p.status === "visited" ? "want" : "visited",
-              }
+            ? { ...p, status: p.status === "visited" ? "want" : "visited" }
             : p
         ),
       };
@@ -79,10 +77,8 @@ function App() {
 
   const { userPlaces, isLoadingUserPlaces, modalIsOpen } = state;
 
-  // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const isEmailValid = emailPattern.test(email);
-
   const authEnabled = isAuthConfirmed;
 
   useEffect(() => {
@@ -105,14 +101,12 @@ function App() {
 
   function handleEmailSubmit(e) {
     e.preventDefault();
-
     if (!isEmailValid) {
       setShowEmailError(true);
       setIsAuthConfirmed(false);
       dispatch({ type: "RESET_USER_STATE" });
       return;
     }
-
     setShowEmailError(false);
     setIsAuthConfirmed(true);
   }
@@ -120,7 +114,6 @@ function App() {
   function handleEmailChange(e) {
     setEmail(e.target.value);
     setShowEmailError(false);
-
     if (isAuthConfirmed) {
       setIsAuthConfirmed(false);
       dispatch({ type: "RESET_USER_STATE" });
@@ -140,9 +133,7 @@ function App() {
 
   async function handleSelectPlace(place) {
     if (!authEnabled) return;
-
     dispatch({ type: "ADD_PLACE_OPTIMISTIC", place });
-
     try {
       await addUserPlace(place);
     } catch {
@@ -153,9 +144,7 @@ function App() {
 
   async function handleToggleStatus(placeId) {
     if (!authEnabled) return;
-
     dispatch({ type: "TOGGLE_STATUS_OPTIMISTIC", placeId });
-
     try {
       await togglePlaceStatus(placeId);
     } catch {
@@ -167,13 +156,10 @@ function App() {
   const handleRemovePlace = useCallback(
     async function () {
       if (!selectedPlace.current || !authEnabled) return;
-
       const placeId = selectedPlace.current.id;
-
       dispatch({ type: "REMOVE_PLACE_OPTIMISTIC", placeId });
       dispatch({ type: "CLOSE_DELETE_MODAL" });
       selectedPlace.current = null;
-
       try {
         await removeUserPlace(placeId);
       } catch {
@@ -185,7 +171,7 @@ function App() {
   );
 
   return (
-    <>
+    <BrowserRouter>
       <Modal open={modalIsOpen} onClose={handleStopRemovePlace}>
         <DeleteConfirmation
           onCancel={handleStopRemovePlace}
@@ -193,53 +179,64 @@ function App() {
         />
       </Modal>
 
-      <header>
-        <img src={logoImg} alt="Place Picker Planner logo" />
-        <h1>Place Picker Planner</h1>
-        <p>Save and organize places you want to visit.</p>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <header>
+                <img src={logoImg} alt="Place Picker Planner logo" />
+                <h1>Place Picker Planner</h1>
+                <p>Save and organize places you want to visit.</p>
 
-        <form onSubmit={handleEmailSubmit}>
-          <input
-            type="email"
-            placeholder="Enter email to enable editing"
-            value={email}
-            onChange={handleEmailChange}
-            aria-invalid={showEmailError}
-          />
-        </form>
+                <form onSubmit={handleEmailSubmit}>
+                  <input
+                    type="email"
+                    placeholder="Enter email to enable editing"
+                    value={email}
+                    onChange={handleEmailChange}
+                    aria-invalid={showEmailError}
+                  />
+                </form>
 
-        {showEmailError && (
-          <p className="error center">
-            Please enter a valid email address (e.g. name@example.com).
-          </p>
-        )}
-      </header>
+                {showEmailError && (
+                  <p className="error center">
+                    Please enter a valid email address (e.g. name@example.com).
+                  </p>
+                )}
+              </header>
 
-      <main>
-        {authEnabled ? (
-          <Places
-            title="My Places"
-            places={userPlaces}
-            isLoading={isLoadingUserPlaces}
-            loadingText="Loading your places..."
-            fallbackText="You have not added any places yet."
-            onSelectPlace={handleStartRemovePlace}
-            onToggleStatus={handleToggleStatus}
-          />
-        ) : (
-          <section className="places-category">
-            <h2>My Places</h2>
-            <p className="fallback-text">
-              Enter a valid email address and press Enter to manage your places.
-            </p>
-          </section>
-        )}
+              <main>
+                {authEnabled ? (
+                  <Places
+                    title="My Places"
+                    places={userPlaces}
+                    isLoading={isLoadingUserPlaces}
+                    loadingText="Loading your places..."
+                    fallbackText="You have not added any places yet."
+                    onSelectPlace={handleStartRemovePlace}
+                    onToggleStatus={handleToggleStatus}
+                  />
+                ) : (
+                  <section className="places-category">
+                    <h2>My Places</h2>
+                    <p className="fallback-text">
+                      Enter a valid email address and press Enter to manage your
+                      places.
+                    </p>
+                  </section>
+                )}
 
-        <AvailablePlaces
-          onSelectPlace={authEnabled ? handleSelectPlace : undefined}
+                <AvailablePlaces
+                  onSelectPlace={authEnabled ? handleSelectPlace : undefined}
+                />
+              </main>
+            </>
+          }
         />
-      </main>
-    </>
+        <Route path="*" element={<ErrorPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
