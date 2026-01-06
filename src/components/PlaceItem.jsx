@@ -2,22 +2,39 @@ export default function PlaceItem({
   place,
   onSelectPlace,
   onToggleStatus,
+  onToggleFavorite,
   showMapPreview,
   disabled,
 }) {
   const hasLocation =
     typeof place.lat === "number" && typeof place.lon === "number";
 
+  const isFavorite = Boolean(place.isFavorite);
+
   return (
     <li className="place-item">
-      <button
-        className="place-image"
-        onClick={() => onSelectPlace(place)}
-        aria-label={`Select ${place.title}`}
-        disabled={disabled}
-      >
-        <img src={place.imageUrl} alt={place.imageAlt} />
-      </button>
+      <div className="place-header">
+        <button
+          className="place-image"
+          onClick={() => onSelectPlace(place)}
+          aria-label={`Select ${place.title}`}
+          disabled={disabled}
+        >
+          <img src={place.imageUrl} alt={place.imageAlt} />
+        </button>
+
+        {onToggleFavorite && (
+          <button
+            className={`favorite-toggle ${isFavorite ? "active" : ""}`}
+            onClick={() => onToggleFavorite(place.id)}
+            aria-pressed={isFavorite}
+            aria-label={`${isFavorite ? "Remove from" : "Add to"} favorites`}
+            disabled={disabled}
+          >
+            {isFavorite ? "★" : "☆"}
+          </button>
+        )}
+      </div>
 
       {showMapPreview && place.isNearest && hasLocation && (
         <div className="map-preview">

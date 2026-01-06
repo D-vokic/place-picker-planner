@@ -26,9 +26,13 @@ function placesReducer(state, action) {
     case "LOAD_USER_PLACES":
       return {
         ...state,
-        userPlaces: action.places,
+        userPlaces: action.places.map((p) => ({
+          ...p,
+          isFavorite: Boolean(p.isFavorite),
+        })),
         isLoadingUserPlaces: false,
       };
+
     case "RESET_USER_STATE":
       return {
         ...state,
@@ -36,21 +40,33 @@ function placesReducer(state, action) {
         isLoadingUserPlaces: false,
         modalIsOpen: false,
       };
+
     case "OPEN_DELETE_MODAL":
       return { ...state, modalIsOpen: true };
+
     case "CLOSE_DELETE_MODAL":
       return { ...state, modalIsOpen: false };
+
     case "ADD_PLACE_OPTIMISTIC":
       if (state.userPlaces.some((p) => p.id === action.place.id)) return state;
       return {
         ...state,
-        userPlaces: [{ ...action.place, status: "want" }, ...state.userPlaces],
+        userPlaces: [
+          {
+            ...action.place,
+            status: "want",
+            isFavorite: false,
+          },
+          ...state.userPlaces,
+        ],
       };
+
     case "REMOVE_PLACE_OPTIMISTIC":
       return {
         ...state,
         userPlaces: state.userPlaces.filter((p) => p.id !== action.placeId),
       };
+
     case "TOGGLE_STATUS_OPTIMISTIC":
       return {
         ...state,
@@ -60,8 +76,18 @@ function placesReducer(state, action) {
             : p
         ),
       };
+
+    case "TOGGLE_FAVORITE_OPTIMISTIC":
+      return {
+        ...state,
+        userPlaces: state.userPlaces.map((p) =>
+          p.id === action.placeId ? { ...p, isFavorite: !p.isFavorite } : p
+        ),
+      };
+
     case "SYNC_USER_PLACES":
       return { ...state, userPlaces: action.places };
+
     default:
       return state;
   }
@@ -153,6 +179,11 @@ function App() {
     }
   }
 
+  function handleToggleFavorite(placeId) {
+    if (!authEnabled) return;
+    dispatch({ type: "TOGGLE_FAVORITE_OPTIMISTIC", placeId });
+  }
+
   const handleRemovePlace = useCallback(
     async function () {
       if (!selectedPlace.current || !authEnabled) return;
@@ -216,6 +247,7 @@ function App() {
                     fallbackText="You have not added any places yet."
                     onSelectPlace={handleStartRemovePlace}
                     onToggleStatus={handleToggleStatus}
+                    onToggleFavorite={handleToggleFavorite}
                   />
                 ) : (
                   <section className="places-category">
