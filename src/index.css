@@ -233,6 +233,12 @@ select {
   border-radius: 8px;
 }
 
+.map-preview {
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 @keyframes slide-up-fade-in {
   from {
     opacity: 0;

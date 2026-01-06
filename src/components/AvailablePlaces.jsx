@@ -73,7 +73,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
       result = sortPlacesByDistance(result, userLocation.lat, userLocation.lon);
     }
 
-    return result.filter((place) => {
+    result = result.filter((place) => {
       const matchesCategory =
         selectedCategory === "all" || place.category === selectedCategory;
 
@@ -83,6 +83,15 @@ export default function AvailablePlaces({ onSelectPlace }) {
 
       return matchesCategory && matchesSearch;
     });
+
+    if (result.length > 0 && userLocation) {
+      result = result.map((place, index) => ({
+        ...place,
+        isNearest: index === 0,
+      }));
+    }
+
+    return result;
   }, [availablePlaces, selectedCategory, searchTerm, userLocation]);
 
   return (

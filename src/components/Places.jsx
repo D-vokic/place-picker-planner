@@ -1,5 +1,7 @@
 import PlacesList from "./PlacesList.jsx";
 
+const MAP_PREVIEW_ENABLED = true;
+
 export default function Places({
   title,
   places,
@@ -31,6 +33,7 @@ export default function Places({
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}
           disabled={isLoading}
+          showMapPreview={MAP_PREVIEW_ENABLED}
         />
       )}
     </section>

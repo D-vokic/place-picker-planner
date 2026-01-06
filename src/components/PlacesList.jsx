@@ -1,6 +1,12 @@
 import PlaceItem from "./PlaceItem.jsx";
 
-export default function PlacesList({ places, onSelectPlace, onToggleStatus }) {
+export default function PlacesList({
+  places,
+  onSelectPlace,
+  onToggleStatus,
+  showMapPreview,
+  disabled,
+}) {
   return (
     <ul className="places">
       {places.map((place) => (
@@ -9,6 +15,8 @@ export default function PlacesList({ places, onSelectPlace, onToggleStatus }) {
           place={place}
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}
+          showMapPreview={showMapPreview}
+          disabled={disabled}
         />
       ))}
     </ul>

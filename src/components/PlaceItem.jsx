@@ -1,13 +1,40 @@
-export default function PlaceItem({ place, onSelectPlace, onToggleStatus }) {
+export default function PlaceItem({
+  place,
+  onSelectPlace,
+  onToggleStatus,
+  showMapPreview,
+  disabled,
+}) {
+  const hasLocation =
+    typeof place.lat === "number" && typeof place.lon === "number";
+
   return (
     <li className="place-item">
       <button
         className="place-image"
         onClick={() => onSelectPlace(place)}
         aria-label={`Select ${place.title}`}
+        disabled={disabled}
       >
         <img src={place.imageUrl} alt={place.imageAlt} />
       </button>
+
+      {showMapPreview && place.isNearest && hasLocation && (
+        <div className="map-preview">
+          <iframe
+            title={`Map preview of ${place.title}`}
+            width="100%"
+            height="150"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${
+              place.lon - 0.01
+            }%2C${place.lat - 0.01}%2C${place.lon + 0.01}%2C${
+              place.lat + 0.01
+            }&layer=mapnik&marker=${place.lat}%2C${place.lon}`}
+          />
+        </div>
+      )}
 
       <h3 className="place-title">{place.title}</h3>
 
@@ -19,6 +46,7 @@ export default function PlaceItem({ place, onSelectPlace, onToggleStatus }) {
           aria-label={`Mark ${place.title} as ${
             place.status === "visited" ? "want to visit" : "visited"
           }`}
+          disabled={disabled}
         >
           {place.status === "visited" ? "Visited" : "Want to visit"}
         </button>
