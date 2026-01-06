@@ -4,6 +4,7 @@ import ErrorPage from "./ErrorPage.jsx";
 import CategoryFilter from "./CategoryFilter.jsx";
 import SearchInput from "./SearchInput.jsx";
 import { fetchPlaces } from "../utils/api.js";
+import { sortPlacesByDistance } from "../loc.js";
 
 export default function AvailablePlaces({ onSelectPlace }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -11,6 +12,21 @@ export default function AvailablePlaces({ onSelectPlace }) {
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
+      },
+      () => {
+        setUserLocation(null);
+      }
+    );
+  }, []);
 
   useEffect(() => {
     async function loadPlaces() {
@@ -26,6 +42,8 @@ export default function AvailablePlaces({ onSelectPlace }) {
           imageAlt: place.image.alt || place.title,
           city: place.city || "",
           category: place.category || "general",
+          lat: place.lat,
+          lon: place.lon,
           status: "available",
         }));
 
@@ -48,8 +66,14 @@ export default function AvailablePlaces({ onSelectPlace }) {
     return Array.from(new Set(availablePlaces.map((place) => place.category)));
   }, [availablePlaces]);
 
-  const filteredPlaces = useMemo(() => {
-    return availablePlaces.filter((place) => {
+  const processedPlaces = useMemo(() => {
+    let result = [...availablePlaces];
+
+    if (userLocation) {
+      result = sortPlacesByDistance(result, userLocation.lat, userLocation.lon);
+    }
+
+    return result.filter((place) => {
       const matchesCategory =
         selectedCategory === "all" || place.category === selectedCategory;
 
@@ -59,7 +83,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
 
       return matchesCategory && matchesSearch;
     });
-  }, [availablePlaces, selectedCategory, searchTerm]);
+  }, [availablePlaces, selectedCategory, searchTerm, userLocation]);
 
   return (
     <>
@@ -73,7 +97,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
 
       <Places
         title="Available Places"
-        places={filteredPlaces}
+        places={processedPlaces}
         isLoading={isFetching}
         loadingText="Fetching places..."
         fallbackText="No places match your search."
