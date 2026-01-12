@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "p20",
+    "title": "Budapest View",
+    "imageUrl": "http://localhost:3000/images/budapest.png",
+    "imageAlt": "Budapest - as nice as possible.",
+    "city": "",
+    "category": "general",
+    "lat": 47.4979,
+    "lon": 19.0402,
+    "status": "available",
+    "isNearest": true,
+    "isFavorite": false
+  }
+]

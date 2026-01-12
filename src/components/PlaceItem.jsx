@@ -5,6 +5,7 @@ export default function PlaceItem({
   onToggleFavorite,
   showMapPreview,
   disabled,
+  highlight,
 }) {
   const hasLocation =
     typeof place.lat === "number" && typeof place.lon === "number";
@@ -12,11 +13,15 @@ export default function PlaceItem({
   const isFavorite = Boolean(place.isFavorite);
 
   return (
-    <li className="place-item">
+    <li className={`place-item ${highlight ? "highlight" : ""}`}>
       <div className="place-header">
         <button
           className="place-image"
-          onClick={() => onSelectPlace(place)}
+          onClick={
+            typeof onSelectPlace === "function"
+              ? () => onSelectPlace(place)
+              : undefined
+          }
           aria-label={`Select ${place.title}`}
           disabled={disabled}
         >

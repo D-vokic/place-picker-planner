@@ -4,8 +4,10 @@ export default function PlacesList({
   places,
   onSelectPlace,
   onToggleStatus,
+  onToggleFavorite,
   showMapPreview,
   disabled,
+  recentlyAddedPlaceId,
 }) {
   return (
     <ul className="places">
@@ -15,8 +17,10 @@ export default function PlacesList({
           place={place}
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}
+          onToggleFavorite={onToggleFavorite}
           showMapPreview={showMapPreview}
           disabled={disabled}
+          highlight={recentlyAddedPlaceId === place.id}
         />
       ))}
     </ul>

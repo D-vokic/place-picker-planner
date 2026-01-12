@@ -59,6 +59,7 @@ app.post("/user-places", async (req, res) => {
     const placeToStore = {
       ...place,
       status: place.status || "want",
+      isFavorite: false,
     };
 
     userPlaces.unshift(placeToStore);
@@ -70,7 +71,6 @@ app.post("/user-places", async (req, res) => {
   }
 });
 
-// TOGGLE status (want <-> visited)
 app.patch("/user-places/:id", async (req, res) => {
   const placeId = req.params.id;
 
@@ -88,6 +88,26 @@ app.patch("/user-places/:id", async (req, res) => {
     res.json({ place });
   } catch {
     res.status(500).json({ message: "Failed to update place status." });
+  }
+});
+
+app.patch("/user-places/:id/favorite", async (req, res) => {
+  const placeId = req.params.id;
+
+  try {
+    const userPlaces = await readJSON("user-places.json");
+    const place = userPlaces.find((p) => p.id === placeId);
+
+    if (!place) {
+      return res.status(404).json({ message: "Place not found." });
+    }
+
+    place.isFavorite = !place.isFavorite;
+
+    await writeJSON("user-places.json", userPlaces);
+    res.json({ place });
+  } catch {
+    res.status(500).json({ message: "Failed to toggle favorite." });
   }
 });
 

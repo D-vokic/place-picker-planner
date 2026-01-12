@@ -1,26 +1,23 @@
-import PlacesList from "./PlacesList.jsx";
+import PlacesList from "../components/PlacesList.jsx";
 
 const MAP_PREVIEW_ENABLED = true;
 
-export default function Places({
-  title,
+export default function MyPlacesView({
   places,
-  fallbackText,
+  isLoading,
   onSelectPlace,
   onToggleStatus,
   onToggleFavorite,
   favoriteOnly,
   setFavoriteOnly,
   recentlyAddedPlaceId,
-  isLoading = false,
-  loadingText = "Loading...",
 }) {
   const hasPlaces = places.length > 0;
 
   return (
     <section className="places-category">
       <div className="places-header">
-        <h2>{title}</h2>
+        <h2>My Places</h2>
         <button
           className={`fav-filter-btn ${favoriteOnly ? "active" : ""}`}
           onClick={() => setFavoriteOnly(!favoriteOnly)}
@@ -32,12 +29,12 @@ export default function Places({
 
       {isLoading && (
         <p className="fallback-text" aria-busy="true">
-          {loadingText}
+          Loading your places...
         </p>
       )}
 
       {!isLoading && !hasPlaces && (
-        <p className="fallback-text">{fallbackText}</p>
+        <p className="fallback-text">You have not added any places yet.</p>
       )}
 
       {!isLoading && hasPlaces && (

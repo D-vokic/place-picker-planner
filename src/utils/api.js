@@ -1,9 +1,5 @@
 const API_BASE_URL = "http://localhost:3000";
 
-/* ------------------------------------------------------------------ */
-/* Low-level HTTP helper */
-/* ------------------------------------------------------------------ */
-
 async function request(endpoint, options = {}) {
   const response = await fetch(API_BASE_URL + endpoint, {
     headers: { "Content-Type": "application/json" },
@@ -18,18 +14,10 @@ async function request(endpoint, options = {}) {
   return response.json();
 }
 
-/* ------------------------------------------------------------------ */
-/* Endpoints */
-/* ------------------------------------------------------------------ */
-
 const ENDPOINTS = {
   PLACES: "/places",
   USER_PLACES: "/user-places",
 };
-
-/* ------------------------------------------------------------------ */
-/* Business / domain API */
-/* ------------------------------------------------------------------ */
 
 export function fetchPlaces() {
   return request(ENDPOINTS.PLACES);
@@ -48,6 +36,12 @@ export function addUserPlace(place) {
 
 export function togglePlaceStatus(placeId) {
   return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
+    method: "PATCH",
+  });
+}
+
+export function togglePlaceFavorite(placeId) {
+  return request(`${ENDPOINTS.USER_PLACES}/${placeId}/favorite`, {
     method: "PATCH",
   });
 }

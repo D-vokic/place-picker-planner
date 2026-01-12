@@ -239,6 +239,20 @@ select {
   overflow: hidden;
 }
 
+.fav-filter-btn {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.fav-filter-btn[aria-pressed="true"] {
+  opacity: 1;
+  font-weight: 600;
+}
+
 @keyframes slide-up-fade-in {
   from {
     opacity: 0;
@@ -267,6 +281,51 @@ select {
 
   .places {
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  }
+
+  .places-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .fav-filter-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: rgba(0, 255, 255, 0.7);
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.15s ease-out;
+  }
+
+  .fav-filter-btn:hover {
+    border-color: rgba(0, 255, 255, 0.6);
+    color: rgba(0, 255, 255, 1);
+  }
+
+  .fav-filter-btn.active {
+    background: rgba(0, 255, 255, 0.15);
+    border-color: rgba(0, 255, 255, 0.6);
+    color: rgb(0, 255, 255);
+    font-weight: 600;
+  }
+
+  .place-item.highlight {
+    animation: highlightFlash 0.7s ease-out;
+  }
+
+  @keyframes highlightFlash {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.6);
+      transform: scale(1.02);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+      transform: scale(1);
+    }
   }
 
   select,
