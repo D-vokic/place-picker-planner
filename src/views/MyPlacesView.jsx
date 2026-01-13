@@ -8,6 +8,7 @@ export default function MyPlacesView({
   onSelectPlace,
   onToggleStatus,
   onToggleFavorite,
+  onOpenNotes,
   favoriteOnly,
   setFavoriteOnly,
   recentlyAddedPlaceId,
@@ -21,17 +22,12 @@ export default function MyPlacesView({
         <button
           className={`fav-filter-btn ${favoriteOnly ? "active" : ""}`}
           onClick={() => setFavoriteOnly(!favoriteOnly)}
-          aria-pressed={favoriteOnly}
         >
           {favoriteOnly ? "⭐ Favorites" : "☆ Favorites"}
         </button>
       </div>
 
-      {isLoading && (
-        <p className="fallback-text" aria-busy="true">
-          Loading your places...
-        </p>
-      )}
+      {isLoading && <p className="fallback-text">Loading your places...</p>}
 
       {!isLoading && !hasPlaces && (
         <p className="fallback-text">You have not added any places yet.</p>
@@ -43,6 +39,7 @@ export default function MyPlacesView({
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}
           onToggleFavorite={onToggleFavorite}
+          onOpenNotes={onOpenNotes}
           disabled={isLoading}
           showMapPreview={MAP_PREVIEW_ENABLED}
           recentlyAddedPlaceId={recentlyAddedPlaceId}

@@ -12,15 +12,18 @@ import MyPlacesView from "./views/MyPlacesView.jsx";
 import AvailablePlacesView from "./views/AvailablePlacesView.jsx";
 import Modal from "./components/Modal.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
+import ModalEditorNotes from "./components/ModalEditorNotes.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
 
 import logoImg from "./assets/logoImg.svg";
+
 import {
   fetchUserPlaces,
   addUserPlace,
   removeUserPlace,
   togglePlaceStatus,
   togglePlaceFavorite,
+  updatePlaceMeta,
 } from "./utils/api.js";
 
 const initialState = {
@@ -64,6 +67,8 @@ function placesReducer(state, action) {
             ...action.place,
             status: "want",
             isFavorite: false,
+            notes: "",
+            plannedDate: null,
           },
           ...state.userPlaces,
         ],
@@ -93,6 +98,14 @@ function placesReducer(state, action) {
         ),
       };
 
+    case "UPDATE_META_OPTIMISTIC":
+      return {
+        ...state,
+        userPlaces: state.userPlaces.map((p) =>
+          p.id === action.placeId ? { ...p, ...action.data } : p
+        ),
+      };
+
     case "SYNC_USER_PLACES":
       return {
         ...state,
@@ -109,6 +122,8 @@ function placesReducer(state, action) {
 
 function App() {
   const selectedPlace = useRef(null);
+  const notesPlace = useRef(null);
+
   const [state, dispatch] = useReducer(placesReducer, initialState);
 
   const [email, setEmail] = useState("");
@@ -117,6 +132,7 @@ function App() {
 
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [recentlyAddedPlaceId, setRecentlyAddedPlaceId] = useState(null);
+  const [notesModalOpen, setNotesModalOpen] = useState(false);
 
   const { userPlaces, isLoadingUserPlaces, modalIsOpen } = state;
 
@@ -246,6 +262,26 @@ function App() {
     [authEnabled]
   );
 
+  function handleOpenNotes(place) {
+    if (!authEnabled) return;
+    notesPlace.current = place;
+    setNotesModalOpen(true);
+  }
+
+  async function handleSaveNotes(data) {
+    const placeId = notesPlace.current?.id;
+    notesPlace.current = null;
+    setNotesModalOpen(false);
+    dispatch({ type: "UPDATE_META_OPTIMISTIC", placeId, data });
+
+    try {
+      await updatePlaceMeta(placeId, data);
+    } catch {
+      const result = await fetchUserPlaces();
+      dispatch({ type: "SYNC_USER_PLACES", places: result.places });
+    }
+  }
+
   return (
     <BrowserRouter>
       <Modal open={modalIsOpen} onClose={handleStopRemovePlace}>
@@ -254,6 +290,14 @@ function App() {
           onConfirm={handleRemovePlace}
         />
       </Modal>
+
+      <ModalEditorNotes
+        open={notesModalOpen}
+        notes={notesPlace.current?.notes}
+        plannedDate={notesPlace.current?.plannedDate}
+        onSave={handleSaveNotes}
+        onClose={() => setNotesModalOpen(false)}
+      />
 
       <Routes>
         <Route
@@ -290,6 +334,7 @@ function App() {
                     onSelectPlace={handleStartRemovePlace}
                     onToggleStatus={handleToggleStatus}
                     onToggleFavorite={handleToggleFavorite}
+                    onOpenNotes={handleOpenNotes}
                     favoriteOnly={favoriteOnly}
                     setFavoriteOnly={setFavoriteOnly}
                     recentlyAddedPlaceId={recentlyAddedPlaceId}
@@ -306,6 +351,7 @@ function App() {
 
                 <AvailablePlacesView
                   onSelectPlace={authEnabled ? handleSelectPlace : undefined}
+                  onOpenNotes={authEnabled ? handleOpenNotes : undefined}
                 />
               </main>
             </>

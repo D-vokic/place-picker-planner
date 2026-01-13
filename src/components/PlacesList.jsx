@@ -5,6 +5,7 @@ export default function PlacesList({
   onSelectPlace,
   onToggleStatus,
   onToggleFavorite,
+  onOpenNotes,
   showMapPreview,
   disabled,
   recentlyAddedPlaceId,
@@ -18,6 +19,7 @@ export default function PlacesList({
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}
           onToggleFavorite={onToggleFavorite}
+          onOpenNotes={onOpenNotes}
           showMapPreview={showMapPreview}
           disabled={disabled}
           highlight={recentlyAddedPlaceId === place.id}

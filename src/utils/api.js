@@ -34,8 +34,14 @@ export function addUserPlace(place) {
   });
 }
 
-export function togglePlaceStatus(placeId) {
+export function removeUserPlace(placeId) {
   return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
+    method: "DELETE",
+  });
+}
+
+export function togglePlaceStatus(placeId) {
+  return request(`${ENDPOINTS.USER_PLACES}/${placeId}/status`, {
     method: "PATCH",
   });
 }
@@ -46,8 +52,9 @@ export function togglePlaceFavorite(placeId) {
   });
 }
 
-export function removeUserPlace(placeId) {
-  return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
-    method: "DELETE",
+export function updatePlaceMeta(placeId, meta) {
+  return request(`${ENDPOINTS.USER_PLACES}/${placeId}/meta`, {
+    method: "PATCH",
+    body: JSON.stringify(meta),
   });
 }

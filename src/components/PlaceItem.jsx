@@ -3,6 +3,7 @@ export default function PlaceItem({
   onSelectPlace,
   onToggleStatus,
   onToggleFavorite,
+  onOpenNotes,
   showMapPreview,
   disabled,
   highlight,
@@ -11,6 +12,8 @@ export default function PlaceItem({
     typeof place.lat === "number" && typeof place.lon === "number";
 
   const isFavorite = Boolean(place.isFavorite);
+  const plannedDate = place.plannedDate || place.meta?.plannedDate;
+  const hasNotes = place.notes || place.meta?.notes;
 
   return (
     <li className={`place-item ${highlight ? "highlight" : ""}`}>
@@ -22,7 +25,6 @@ export default function PlaceItem({
               ? () => onSelectPlace(place)
               : undefined
           }
-          aria-label={`Select ${place.title}`}
           disabled={disabled}
         >
           <img src={place.imageUrl} alt={place.imageAlt} />
@@ -32,8 +34,6 @@ export default function PlaceItem({
           <button
             className={`favorite-toggle ${isFavorite ? "active" : ""}`}
             onClick={() => onToggleFavorite(place.id)}
-            aria-pressed={isFavorite}
-            aria-label={`${isFavorite ? "Remove from" : "Add to"} favorites`}
             disabled={disabled}
           >
             {isFavorite ? "★" : "☆"}
@@ -48,7 +48,6 @@ export default function PlaceItem({
             width="100%"
             height="150"
             loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
             src={`https://www.openstreetmap.org/export/embed.html?bbox=${
               place.lon - 0.01
             }%2C${place.lat - 0.01}%2C${place.lon + 0.01}%2C${
@@ -64,13 +63,21 @@ export default function PlaceItem({
         <button
           className="status-toggle"
           onClick={() => onToggleStatus(place.id)}
-          aria-pressed={place.status === "visited"}
-          aria-label={`Mark ${place.title} as ${
-            place.status === "visited" ? "want to visit" : "visited"
-          }`}
           disabled={disabled}
         >
           {place.status === "visited" ? "Visited" : "Want to visit"}
+        </button>
+      )}
+
+      {plannedDate && <p className="planned-date">Planned: {plannedDate}</p>}
+
+      {onOpenNotes && (
+        <button
+          className="notes-btn"
+          onClick={() => onOpenNotes(place)}
+          disabled={disabled}
+        >
+          Notes{hasNotes ? "*" : ""}
         </button>
       )}
     </li>

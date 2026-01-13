@@ -1,15 +1,28 @@
 [
   {
-    "id": "p20",
-    "title": "Budapest View",
-    "imageUrl": "http://localhost:3000/images/budapest.png",
-    "imageAlt": "Budapest - as nice as possible.",
+    "id": "p19",
+    "title": "Belgrade Sunset",
+    "imageUrl": "http://localhost:3000/images/belgradeSunset.png",
+    "imageAlt": "Beautifull Sunset over capitol of Sebia Belgrade.",
     "city": "",
     "category": "general",
-    "lat": 47.4979,
-    "lon": 19.0402,
+    "lat": 44.7866,
+    "lon": 20.4489,
     "status": "available",
-    "isNearest": true,
+    "isNearest": false,
+    "isFavorite": true
+  },
+  {
+    "id": "p12",
+    "title": "Venetian Canals",
+    "imageUrl": "http://localhost:3000/images/venetian-canals.jpg",
+    "imageAlt": "Glistening waters of the Venetian canals as gondolas glide by at sunset.",
+    "city": "",
+    "category": "general",
+    "lat": 45.4408,
+    "lon": 12.3155,
+    "status": "available",
+    "isNearest": false,
     "isFavorite": false
   }
 ]
