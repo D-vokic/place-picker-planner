@@ -10,6 +10,7 @@ export default function AvailablePlacesView({ onSelectPlace }) {
   const [isFetching, setIsFetching] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [error, setError] = useState(null);
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [userLocation, setUserLocation] = useState(null);
@@ -24,7 +25,7 @@ export default function AvailablePlacesView({ onSelectPlace }) {
       },
       () => {
         setUserLocation(null);
-      }
+      },
     );
   }, []);
 

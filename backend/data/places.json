@@ -2,6 +2,7 @@
   {
     "id": "p1",
     "title": "Forest Waterfall",
+    "category": "waterfall",
     "image": {
       "src": "forest-waterfall.jpg",
       "alt": "A tranquil forest with a cascading waterfall amidst greenery."
@@ -12,6 +13,7 @@
   {
     "id": "p2",
     "title": "Sahara Desert Dunes",
+    "category": "desert",
     "image": {
       "src": "desert-dunes.jpg",
       "alt": "Golden dunes stretching to the horizon in the Sahara Desert."
@@ -22,6 +24,7 @@
   {
     "id": "p3",
     "title": "Himalayan Peaks",
+    "category": "mountain",
     "image": {
       "src": "majestic-mountains.jpg",
       "alt": "The sun setting behind snow-capped peaks of majestic mountains."
@@ -32,6 +35,7 @@
   {
     "id": "p4",
     "title": "Caribbean Beach",
+    "category": "beach",
     "image": {
       "src": "caribbean-beach.jpg",
       "alt": "Pristine white sand and turquoise waters of a Caribbean beach."
@@ -42,6 +46,7 @@
   {
     "id": "p5",
     "title": "Ancient Grecian Ruins",
+    "category": "city",
     "image": {
       "src": "ruins.jpg",
       "alt": "Historic ruins standing tall against the backdrop of the Grecian sky."
@@ -52,6 +57,7 @@
   {
     "id": "p6",
     "title": "Amazon Rainforest Canopy",
+    "category": "nature",
     "image": {
       "src": "rainforest.jpg",
       "alt": "Lush canopy of a rainforest, teeming with life."
@@ -62,6 +68,7 @@
   {
     "id": "p7",
     "title": "Northern Lights",
+    "category": "nature",
     "image": {
       "src": "northern-lights.jpg",
       "alt": "Dazzling display of the Northern Lights in a starry sky."
@@ -72,6 +79,7 @@
   {
     "id": "p8",
     "title": "Japanese Temple",
+    "category": "city",
     "image": {
       "src": "japanese-temple.jpg",
       "alt": "Ancient Japanese temple surrounded by autumn foliage."
@@ -82,6 +90,7 @@
   {
     "id": "p9",
     "title": "Great Barrier Reef",
+    "category": "nature",
     "image": {
       "src": "great-barrier-reef.jpg",
       "alt": "Vibrant coral formations of the Great Barrier Reef underwater."
@@ -92,6 +101,7 @@
   {
     "id": "p10",
     "title": "Parisian Streets",
+    "category": "city",
     "image": {
       "src": "parisian-streets.jpg",
       "alt": "Charming streets of Paris with historic buildings and cafes."
@@ -102,6 +112,7 @@
   {
     "id": "p11",
     "title": "Grand Canyon",
+    "category": "desert",
     "image": {
       "src": "grand-canyon.jpg",
       "alt": "Expansive view of the deep gorges and ridges of the Grand Canyon."
@@ -112,6 +123,7 @@
   {
     "id": "p12",
     "title": "Venetian Canals",
+    "category": "city",
     "image": {
       "src": "venetian-canals.jpg",
       "alt": "Glistening waters of the Venetian canals as gondolas glide by at sunset."
@@ -122,6 +134,7 @@
   {
     "id": "p13",
     "title": "Taj Mahal",
+    "category": "city",
     "image": {
       "src": "taj-mahal.jpg",
       "alt": "The iconic Taj Mahal reflecting in its surrounding waters during sunrise."
@@ -132,6 +145,7 @@
   {
     "id": "p14",
     "title": "Kerala Backwaters",
+    "category": "waterfall",
     "image": {
       "src": "kerala-backwaters.jpg",
       "alt": "Tranquil waters and lush greenery of the Kerala backwaters."
@@ -142,6 +156,7 @@
   {
     "id": "p15",
     "title": "African Savanna",
+    "category": "nature",
     "image": {
       "src": "african-savanna.jpg",
       "alt": "Wild animals roaming freely in the vast landscapes of the African savanna."
@@ -152,6 +167,7 @@
   {
     "id": "p16",
     "title": "Victoria Falls",
+    "category": "waterfall",
     "image": {
       "src": "victoria-falls.jpg",
       "alt": "The powerful cascade of Victoria Falls, a natural wonder between Zambia and Zimbabwe."
@@ -162,6 +178,7 @@
   {
     "id": "p17",
     "title": "Machu Picchu",
+    "category": "mountain",
     "image": {
       "src": "machu-picchu.jpg",
       "alt": "The historic Incan citadel of Machu Picchu illuminated by the morning sun."
@@ -172,6 +189,7 @@
   {
     "id": "p18",
     "title": "Amazon River",
+    "category": "nature",
     "image": {
       "src": "amazon-river.jpg",
       "alt": "Navigating the waters of the Amazon River, surrounded by dense rainforest."
@@ -182,6 +200,7 @@
   {
     "id": "p19",
     "title": "Belgrade Sunset",
+    "category": "My favorite",
     "image": {
       "src": "belgradeSunset.png",
       "alt": "Beautifull Sunset over capitol of Sebia Belgrade."
@@ -192,6 +211,7 @@
   {
     "id": "p20",
     "title": "Budapest View",
+    "category": "city",
     "image": {
       "src": "budapest.png",
       "alt": "Budapest - as nice as possible."
