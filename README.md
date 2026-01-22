@@ -73,6 +73,7 @@ The following files are defined in the project root:
 | `VITE_RESET_STATUS_ON_LOAD` | Controls whether place status is reset on load |
 | `VITE_DEBUG`                | Enables or disables development-only debugging |
 
+---
 
 ### Behavior Differences
 
@@ -80,22 +81,50 @@ The following files are defined in the project root:
 
 - Uses local backend (`localhost`)
 - Resets place status to **“Want to visit”** on each session
-- Allows development-only debugging behavior
+- Enables development-only debugging
 
 **Production (`.env.production`)**
 
 - Uses production backend
-- Preserves backend state for place status and notes
+- Preserves backend state for place status, notes, and planned dates
 - No development-only logic is applied
 
 This setup ensures a clean development experience while keeping production behavior stable and predictable for end users.
 
----
+## Implemented Features
+
+At this stage, the project includes:
+
+- Cleaned and refactored UI (course-specific code removed)
+- Defined place data model (id, title, image, city, category, status)
+- Centralized backend API (places / user-places)
+- Centralized fetch utility with error handling
+- Available Places and My Places views
+- Adding places with optimistic UI updates
+- Removing places with confirmation modal
+- Persistent user-places stored on backend
+- Favorites (star toggle)
+- Place status tracking (want to visit / visited)
+- Notes and planned visit date per place
+- Category filtering and text search
+- Optional map preview for places
+- Responsive layout (mobile to desktop)
+- Loading states and fallback UI
+- Basic accessibility support
+- Simple email-based edit mode
+- Route structure with error handling
+
+## Styling & Maintainability
+
+- CSS refactored into smaller, responsibility-based files
+- index.css acts as a clean entry point
+- Styles separated into animations, modal, forms, components, layout, and responsive rules
+- No visual regressions introduced during refactoring
 
 ## Project Goals
 
 - Build a complete, real-world React application
-- Avoid course-specific or demo-only patterns
+- Avoid specific or demo-only patterns
 - Focus on clean architecture, maintainability, and UX
 - Incrementally evolve features with meaningful commits
 - Deliver a fully functional v1.0 product
@@ -108,13 +137,9 @@ At this stage, the project includes:
 
 - React frontend built with Vite
 - Node.js + Express backend
-- Initial UI layout and branding
-- Custom SVG logo
-- Basic project and folder structure
-- Static data sources (JSON)
-- No authentication or advanced state management yet
-
-This phase intentionally focuses on cleanup and foundation, not features.
+- Modularized CSS architecture
+- JSON-based backend persistence
+- Environment-based configuration (dev / prod)
 
 ---
 
@@ -155,6 +180,7 @@ PlacePicker/
 ├── src/
 │   ├── assets/
 │   ├── components/
+│   ├── styles/
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
@@ -173,12 +199,10 @@ PlacePicker/
 
 ### Roadmap (High-Level)
 
-- Clean up course-specific code
-- Define a stable data model for places
-- Implement backend API endpoints
-- Add user-specific place management
-- Introduce filtering, search, and status tracking
-- Improve UX, accessibility, and responsiveness
+- Improve accessibility
+- Introduce multi-user backend support
+- Add theming support
+- Prepare production deployment
 - Finalize v1.0 release
 
 ---
@@ -186,7 +210,6 @@ PlacePicker/
 ### Status
 
 This project is under active development.
-Current phase: Initial cleanup and project baseline setup
 
 ---
 
