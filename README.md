@@ -54,6 +54,43 @@ The frontend and backend servers must be running simultaneously for the applicat
 
 ---
 
+## Environment Configuration (Development / Production)
+
+The application uses **Vite environment variables** to separate development and production behavior without changing the codebase.
+
+### Environment Files
+
+The following files are defined in the project root:
+
+- `.env.development`
+- `.env.production`
+
+### Supported Variables
+
+| Variable                    | Description                                    |
+| --------------------------- | ---------------------------------------------- |
+| `VITE_API_BASE_URL`         | Backend API base URL                           |
+| `VITE_RESET_STATUS_ON_LOAD` | Controls whether place status is reset on load |
+| `VITE_DEBUG`                | Enables or disables development-only debugging |
+
+---
+
+### Behavior Differences
+
+**Development (`.env.development`)**
+
+- Uses local backend (`localhost`)
+- Resets place status to **“Want to visit”** on each session
+- Allows development-only debugging behavior
+
+**Production (`.env.production`)**
+
+- Uses production backend
+- Preserves backend state for place status and notes
+- No development-only logic is applied
+
+This setup ensures a clean development experience while keeping production behavior stable and predictable for end users.
+
 ## Project Goals
 
 - Build a complete, real-world React application

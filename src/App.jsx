@@ -26,6 +26,9 @@ import {
   updatePlaceMeta,
 } from "./utils/api.js";
 
+const RESET_STATUS_ON_LOAD =
+  import.meta.env.VITE_RESET_STATUS_ON_LOAD === "true";
+
 const initialState = {
   userPlaces: [],
   isLoadingUserPlaces: true,
@@ -39,7 +42,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: action.places.map((p) => ({
           ...p,
-          status: "want",
+          status: RESET_STATUS_ON_LOAD ? "want" : p.status,
           isFavorite: Boolean(p.isFavorite),
         })),
         isLoadingUserPlaces: false,
@@ -280,7 +283,6 @@ function App() {
   }
 
   async function handleSaveNotes(data) {
-    // console.log("HANDLE SAVE NOTES", data, notesPlace.current);
     const placeId = notesPlace.current?.id;
     notesPlace.current = null;
     setNotesModalOpen(false);
