@@ -73,7 +73,6 @@ The following files are defined in the project root:
 | `VITE_RESET_STATUS_ON_LOAD` | Controls whether place status is reset on load |
 | `VITE_DEBUG`                | Enables or disables development-only debugging |
 
----
 
 ### Behavior Differences
 
@@ -90,6 +89,8 @@ The following files are defined in the project root:
 - No development-only logic is applied
 
 This setup ensures a clean development experience while keeping production behavior stable and predictable for end users.
+
+---
 
 ## Project Goals
 
