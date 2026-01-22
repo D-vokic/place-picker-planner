@@ -7,24 +7,25 @@ export default function ModalEditorNotes({
   onSave,
   onClose,
 }) {
-  const [localNotes, setLocalNotes] = useState(notes || "");
-  const [localDate, setLocalDate] = useState(plannedDate || "");
+  const [localNotes, setLocalNotes] = useState("");
+  const [localDate, setLocalDate] = useState("");
 
   useEffect(() => {
     if (open) {
-      setLocalNotes(notes || "");
-      setLocalDate(plannedDate || "");
+      setLocalNotes(notes ?? "");
+      setLocalDate(plannedDate ?? "");
     }
   }, [open, notes, plannedDate]);
 
   if (!open) return null;
 
   function handleSave() {
-    if (!onSave) return;
+    // console.log("SAVE CLICK", { localNotes, localDate });
     onSave({
       notes: localNotes,
       plannedDate: localDate || null,
     });
+    onClose();
   }
 
   return (
@@ -40,7 +41,7 @@ export default function ModalEditorNotes({
 
         <input
           type="date"
-          value={localDate || ""}
+          value={localDate}
           onChange={(e) => setLocalDate(e.target.value)}
         />
 

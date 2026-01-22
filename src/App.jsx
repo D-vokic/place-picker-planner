@@ -39,6 +39,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: action.places.map((p) => ({
           ...p,
+          status: "want",
           isFavorite: Boolean(p.isFavorite),
         })),
         isLoadingUserPlaces: false,
@@ -67,8 +68,10 @@ function placesReducer(state, action) {
             ...action.place,
             status: "want",
             isFavorite: false,
-            notes: "",
-            plannedDate: null,
+            meta: {
+              notes: "",
+              plannedDate: null,
+            },
           },
           ...state.userPlaces,
         ],
@@ -86,7 +89,7 @@ function placesReducer(state, action) {
         userPlaces: state.userPlaces.map((p) =>
           p.id === action.placeId
             ? { ...p, status: p.status === "visited" ? "want" : "visited" }
-            : p
+            : p,
         ),
       };
 
@@ -94,7 +97,7 @@ function placesReducer(state, action) {
       return {
         ...state,
         userPlaces: state.userPlaces.map((p) =>
-          p.id === action.placeId ? { ...p, isFavorite: !p.isFavorite } : p
+          p.id === action.placeId ? { ...p, isFavorite: !p.isFavorite } : p,
         ),
       };
 
@@ -102,7 +105,15 @@ function placesReducer(state, action) {
       return {
         ...state,
         userPlaces: state.userPlaces.map((p) =>
-          p.id === action.placeId ? { ...p, ...action.data } : p
+          p.id === action.placeId
+            ? {
+                ...p,
+                meta: {
+                  ...(p.meta || {}),
+                  ...action.data,
+                },
+              }
+            : p,
         ),
       };
 
@@ -259,7 +270,7 @@ function App() {
         dispatch({ type: "SYNC_USER_PLACES", places: data.places });
       }
     },
-    [authEnabled]
+    [authEnabled],
   );
 
   function handleOpenNotes(place) {
@@ -269,9 +280,11 @@ function App() {
   }
 
   async function handleSaveNotes(data) {
+    // console.log("HANDLE SAVE NOTES", data, notesPlace.current);
     const placeId = notesPlace.current?.id;
     notesPlace.current = null;
     setNotesModalOpen(false);
+
     dispatch({ type: "UPDATE_META_OPTIMISTIC", placeId, data });
 
     try {
@@ -293,8 +306,8 @@ function App() {
 
       <ModalEditorNotes
         open={notesModalOpen}
-        notes={notesPlace.current?.notes}
-        plannedDate={notesPlace.current?.plannedDate}
+        notes={notesPlace.current?.meta?.notes}
+        plannedDate={notesPlace.current?.meta?.plannedDate}
         onSave={handleSaveNotes}
         onClose={() => setNotesModalOpen(false)}
       />

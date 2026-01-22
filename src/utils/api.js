@@ -53,8 +53,10 @@ export function togglePlaceFavorite(placeId) {
 }
 
 export function updatePlaceMeta(placeId, meta) {
-  return request(`${ENDPOINTS.USER_PLACES}/${placeId}/meta`, {
+  return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
     method: "PATCH",
-    body: JSON.stringify(meta),
+    body: JSON.stringify({
+      meta,
+    }),
   });
 }

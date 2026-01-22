@@ -60,6 +60,8 @@ app.post("/user-places", async (req, res) => {
       ...place,
       status: place.status || "want",
       isFavorite: false,
+      notes: "",
+      plannedDate: null,
     };
 
     userPlaces.unshift(placeToStore);
@@ -108,6 +110,28 @@ app.patch("/user-places/:id/favorite", async (req, res) => {
     res.json({ place });
   } catch {
     res.status(500).json({ message: "Failed to toggle favorite." });
+  }
+});
+
+app.patch("/user-places/:id/meta", async (req, res) => {
+  const placeId = req.params.id;
+  const meta = req.body;
+
+  try {
+    const userPlaces = await readJSON("user-places.json");
+    const place = userPlaces.find((p) => p.id === placeId);
+
+    if (!place) {
+      return res.status(404).json({ message: "Place not found." });
+    }
+
+    place.notes = meta.notes ?? place.notes;
+    place.plannedDate = meta.plannedDate ?? place.plannedDate;
+
+    await writeJSON("user-places.json", userPlaces);
+    res.json({ place });
+  } catch {
+    res.status(500).json({ message: "Failed to update place meta." });
   }
 });
 
