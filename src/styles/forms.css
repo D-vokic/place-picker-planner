@@ -1,0 +1,45 @@
+header input[type="email"] {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  width: 100%;
+  max-width: 22rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #defaf8;
+  background-color: #1f1c2c;
+  border: 2px solid #0d373e;
+  border-radius: 6px;
+  outline: none;
+}
+header input[type="email"]::placeholder {
+  color: #9eb5b4;
+}
+header input[type="email"]:focus {
+  border-color: #8feeff;
+  box-shadow: 0 0 0 2px rgba(143, 238, 255, 0.25);
+}
+
+select,
+input[type="text"] {
+  width: 100%;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #defaf8;
+  background-color: #1f1c2c;
+  border: 2px solid #0d373e;
+  border-radius: 6px;
+}
+select {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #8feeff 50%),
+    linear-gradient(135deg, #8feeff 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.2rem) calc(50% - 3px),
+    calc(100% - 0.8rem) calc(50% - 3px);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
