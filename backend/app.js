@@ -58,10 +58,8 @@ app.post("/user-places", async (req, res) => {
 
     const placeToStore = {
       ...place,
-      status: place.status || "want",
+      status: "want",
       isFavorite: false,
-      notes: "",
-      plannedDate: null,
     };
 
     userPlaces.unshift(placeToStore);
@@ -73,7 +71,7 @@ app.post("/user-places", async (req, res) => {
   }
 });
 
-app.patch("/user-places/:id", async (req, res) => {
+app.patch("/user-places/:id/status", async (req, res) => {
   const placeId = req.params.id;
 
   try {
@@ -113,9 +111,9 @@ app.patch("/user-places/:id/favorite", async (req, res) => {
   }
 });
 
-app.patch("/user-places/:id/meta", async (req, res) => {
+app.patch("/user-places/:id", async (req, res) => {
   const placeId = req.params.id;
-  const meta = req.body;
+  const { meta } = req.body;
 
   try {
     const userPlaces = await readJSON("user-places.json");
@@ -125,8 +123,10 @@ app.patch("/user-places/:id/meta", async (req, res) => {
       return res.status(404).json({ message: "Place not found." });
     }
 
-    place.notes = meta.notes ?? place.notes;
-    place.plannedDate = meta.plannedDate ?? place.plannedDate;
+    place.meta = {
+      ...(place.meta || {}),
+      ...(meta || {}),
+    };
 
     await writeJSON("user-places.json", userPlaces);
     res.json({ place });
