@@ -124,6 +124,9 @@ function placesReducer(state, action) {
       };
 
     case "UPDATE_META_OPTIMISTIC":
+      if (!state.userPlaces.some((p) => p.id === action.placeId)) {
+        return state;
+      }
       return {
         ...state,
         userPlaces: state.userPlaces.map((place) =>

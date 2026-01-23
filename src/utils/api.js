@@ -19,10 +19,14 @@ async function request(endpoint, options = {}) {
       const error = await response.json();
       errorMessage = error.message || errorMessage;
     } catch {
-      /* ignore JSON parse errors */
+      /* ignore */
     }
 
     throw new Error(errorMessage);
+  }
+
+  if (response.status === 204) {
+    return null;
   }
 
   return response.json();
@@ -69,8 +73,6 @@ export function togglePlaceFavorite(placeId) {
 export function updatePlaceMeta(placeId, meta) {
   return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
     method: "PATCH",
-    body: JSON.stringify({
-      meta,
-    }),
+    body: JSON.stringify({ meta }),
   });
 }
