@@ -1,0 +1,171 @@
+Place Picker Planner – v1.0 Project Context
+----------------------------------------------
+
+This document describes the current state of the Place Picker Planner application as of version 1.0.
+It is intended to help a developer (human or AI) who continues the project understand what has been built, how the application is structured, and which decisions were made so far.
+
+The project is a full-stack React application with a simple Node.js + Express backend.
+It was intentionally developed as a real-world, production-oriented application rather than a course demo.
+The focus of version 1.0 was correctness, maintainability, and clean architecture, not feature quantity.
+
+General Concept
+----------------
+
+The application allows a user to browse a list of available places, select places they want to save, and manage those saved places.
+
+Management includes:
+
+- marking places as visited or planned
+- adding notes and planned visit dates
+- favoriting places
+- filtering and searching
+- deleting places
+
+All user-related data is persisted on the backend.
+
+There is no real authentication system yet.
+Instead, a simple email-based edit mode is used to enable or disable editing functionality.
+This was a deliberate choice to avoid premature complexity in v1.0.
+______________________________________________________________________________________________________
+
+Backend Overview
+-----------------
+
+The backend is a lightweight Express server using JSON files as a temporary data store.
+
+Main datasets:
+----------------
+
+- places.json: static list of available places
+- user-places.json: user-selected places
+
+Exposed API:
+------------
+
+- GET /places
+- GET /user-places
+- POST /user-places
+- DELETE /user-places/:id
+- PATCH endpoints for status, favorites, and metadata (notes and planned date)
+
+The backend contains no UI logic and no user identity logic beyond storing places.
+
+It is intentionally simple so that migration to a real database later will be straightforward.
+
+
+Frontend Overview
+-------------------
+
+The frontend is built with React and Vite.
+
+State management:
+
+- useReducer is used for user places and related UI state
+- business logic is kept out of presentational components
+
+Main views:
+-------------
+
+- Available Places: browsing, search, category filtering
+- My Places: managing saved places
+
+Implemented features:
+---------------------
+
+- optimistic updates for add / remove / toggle actions
+- favorites toggle
+- status toggle (Want to visit / Visited)
+- notes and planned visit date per place
+- category filtering combined with text search
+- optional map preview for nearest place
+- delete confirmation modal
+- loading states and fallback UI
+- global error handling via ErrorPage
+
+Data Model
+-----------
+
+A place is treated consistently across the app and backend.
+
+Core fields:
+
+- id
+- title
+- image (src, alt)
+- city (optional)
+- category
+- status
+- meta (notes, plannedDate)
+- lat / lon
+
+Categories are defined in places.json and automatically populate the category filter.
+No hardcoded category list exists in the frontend.
+
+Styling
+---------
+
+CSS was refactored from a single large file into responsibility-based files:
+
+- animations
+- modal
+- forms
+- components
+- layout
+- responsive
+
+index.css is now only an entry point.
+
+This refactor was done incrementally with visual verification at each step to avoid regressions.
+_______________________________________________________________________________________________________
+
+Environment Configuration
+---------------------------
+
+The project uses Vite environment variables to separate development and production behavior.
+
+Environment files:
+
+- .env.development
+- .env.production
+
+API base URLs and dev-only behavior are controlled via env variables.
+
+Development mode may allow certain reset or debug behavior.
+Production mode fully respects backend state.
+_____________________________________________________________________________________________________________
+
+Project Philosophy
+-------------------
+
+Version 1.0 prioritizes:
+
+- clean structure
+- predictable behavior
+- minimal but complete feature set
+- readiness for future expansion
+
+Intentionally not implemented in v1.0:
+
+- real authentication
+- multi-user data separation
+- database persistence
+- advanced UI effects
+- automated testing
+
+These are postponed to v1.1 and v2.0.
+_________________________________________________
+
+How to Continue
+
+Anyone continuing the project should:
+
+- treat v1.0 as a stable baseline
+- avoid large refactors without reason
+- follow existing patterns (useReducer, optimistic updates, env-based config)
+- implement new features incrementally with clear commits
+
+The roadmap toward v1.1 and v2.0 is designed to build on this foundation without rewriting existing code.
+___________________________________________________________________________________________________________
+
+End of document.
+___________________________________________________________________________________________________________
