@@ -1,17 +1,30 @@
 import express from "express";
-import fs from "fs/promises";
 import path from "path";
 import cors from "cors";
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const DATA_DIR = path.join(process.cwd(), "data");
 const IMAGES_DIR = path.join(process.cwd(), "images");
-
 app.use("/images", express.static(IMAGES_DIR));
+
+const db = await open({
+  filename: path.join(process.cwd(), "data", "app.db"),
+  driver: sqlite3.Database,
+});
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS user_places (
+    id TEXT,
+    user_id TEXT,
+    data TEXT,
+    PRIMARY KEY (id, user_id)
+  )
+`);
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -37,41 +50,19 @@ function authMiddleware(req, res, next) {
 
 app.use(authMiddleware);
 
-function getUserPlacesFile(req) {
-  return `user-places-${req.user.id}.json`;
-}
-
-async function readJSON(fileName) {
-  const filePath = path.join(DATA_DIR, fileName);
-  try {
-    const data = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function writeJSON(fileName, data) {
-  const filePath = path.join(DATA_DIR, fileName);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-}
-
 app.get("/places", async (req, res) => {
-  try {
-    const places = await readJSON("places.json");
-    res.json({ places });
-  } catch {
-    res.status(500).json({ message: "Failed to load places." });
-  }
+  const rows = await db.all("SELECT data FROM places");
+  const places = rows.map((r) => JSON.parse(r.data));
+  res.json({ places });
 });
 
 app.get("/user-places", async (req, res) => {
-  try {
-    const places = await readJSON(getUserPlacesFile(req));
-    res.json({ places });
-  } catch {
-    res.status(500).json({ message: "Failed to load user places." });
-  }
+  const rows = await db.all(
+    "SELECT data FROM user_places WHERE user_id = ?",
+    req.user.id,
+  );
+  const places = rows.map((r) => JSON.parse(r.data));
+  res.json({ places });
 });
 
 app.post("/user-places", async (req, res) => {
@@ -81,109 +72,104 @@ app.post("/user-places", async (req, res) => {
     return res.status(400).json({ message: "Invalid place data." });
   }
 
-  try {
-    const fileName = getUserPlacesFile(req);
-    const userPlaces = await readJSON(fileName);
-
-    if (userPlaces.some((p) => p.id === place.id)) {
-      return res.status(409).json({ message: "Place already added." });
-    }
-
-    const placeToStore = {
+  await db.run(
+    "INSERT OR IGNORE INTO user_places (id, user_id, data) VALUES (?, ?, ?)",
+    place.id,
+    req.user.id,
+    JSON.stringify({
       ...place,
       status: "want",
       isFavorite: false,
-    };
+    }),
+  );
 
-    userPlaces.unshift(placeToStore);
-    await writeJSON(fileName, userPlaces);
-
-    res.status(201).json({ place: placeToStore });
-  } catch {
-    res.status(500).json({ message: "Failed to save place." });
-  }
+  res.status(201).json({ place });
 });
 
 app.patch("/user-places/:id/status", async (req, res) => {
-  const placeId = req.params.id;
+  const row = await db.get(
+    "SELECT data FROM user_places WHERE id = ? AND user_id = ?",
+    req.params.id,
+    req.user.id,
+  );
 
-  try {
-    const fileName = getUserPlacesFile(req);
-    const userPlaces = await readJSON(fileName);
-    const place = userPlaces.find((p) => p.id === placeId);
-
-    if (!place) {
-      return res.status(404).json({ message: "Place not found." });
-    }
-
-    place.status = place.status === "visited" ? "want" : "visited";
-
-    await writeJSON(fileName, userPlaces);
-    res.json({ place });
-  } catch {
-    res.status(500).json({ message: "Failed to update place status." });
+  if (!row) {
+    return res.status(404).json({ message: "Place not found." });
   }
+
+  const place = JSON.parse(row.data);
+  place.status = place.status === "visited" ? "want" : "visited";
+
+  await db.run(
+    "UPDATE user_places SET data = ? WHERE id = ? AND user_id = ?",
+    JSON.stringify(place),
+    req.params.id,
+    req.user.id,
+  );
+
+  res.json({ place });
 });
 
 app.patch("/user-places/:id/favorite", async (req, res) => {
-  const placeId = req.params.id;
+  const row = await db.get(
+    "SELECT data FROM user_places WHERE id = ? AND user_id = ?",
+    req.params.id,
+    req.user.id,
+  );
 
-  try {
-    const fileName = getUserPlacesFile(req);
-    const userPlaces = await readJSON(fileName);
-    const place = userPlaces.find((p) => p.id === placeId);
-
-    if (!place) {
-      return res.status(404).json({ message: "Place not found." });
-    }
-
-    place.isFavorite = !place.isFavorite;
-
-    await writeJSON(fileName, userPlaces);
-    res.json({ place });
-  } catch {
-    res.status(500).json({ message: "Failed to toggle favorite." });
+  if (!row) {
+    return res.status(404).json({ message: "Place not found." });
   }
+
+  const place = JSON.parse(row.data);
+  place.isFavorite = !place.isFavorite;
+
+  await db.run(
+    "UPDATE user_places SET data = ? WHERE id = ? AND user_id = ?",
+    JSON.stringify(place),
+    req.params.id,
+    req.user.id,
+  );
+
+  res.json({ place });
 });
 
 app.patch("/user-places/:id", async (req, res) => {
-  const placeId = req.params.id;
-  const { meta } = req.body;
+  const row = await db.get(
+    "SELECT data FROM user_places WHERE id = ? AND user_id = ?",
+    req.params.id,
+    req.user.id,
+  );
 
-  try {
-    const fileName = getUserPlacesFile(req);
-    const userPlaces = await readJSON(fileName);
-    const place = userPlaces.find((p) => p.id === placeId);
-
-    if (!place) {
-      return res.status(404).json({ message: "Place not found." });
-    }
-
-    place.meta = {
-      ...(place.meta || {}),
-      ...(meta || {}),
-    };
-
-    await writeJSON(fileName, userPlaces);
-    res.json({ place });
-  } catch {
-    res.status(500).json({ message: "Failed to update place meta." });
+  if (!row) {
+    return res.status(404).json({ message: "Place not found." });
   }
+
+  const place = JSON.parse(row.data);
+
+  place.meta = {
+    ...(place.meta || {}),
+    ...(req.body.meta || {}),
+  };
+
+  await db.run(
+    "UPDATE user_places SET data = ? WHERE id = ? AND user_id = ?",
+    JSON.stringify(place),
+    req.params.id,
+    req.user.id,
+  );
+
+  res.json({ place });
 });
 
 app.delete("/user-places/:id", async (req, res) => {
-  const placeId = req.params.id;
+  await db.run(
+    "DELETE FROM user_places WHERE id = ? AND user_id = ?",
+    req.params.id,
+    req.user.id,
+  );
 
-  try {
-    const fileName = getUserPlacesFile(req);
-    const userPlaces = await readJSON(fileName);
-    const updatedPlaces = userPlaces.filter((p) => p.id !== placeId);
-
-    await writeJSON(fileName, updatedPlaces);
-    res.json({ message: "Place removed." });
-  } catch {
-    res.status(500).json({ message: "Failed to remove place." });
-  }
+  res.json({ message: "Place removed." });
 });
 
 app.listen(3000, () => {
