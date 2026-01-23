@@ -12,8 +12,8 @@ export default function PlaceItem({
     typeof place.lat === "number" && typeof place.lon === "number";
 
   const isFavorite = Boolean(place.isFavorite);
-  const plannedDate = place.plannedDate || place.meta?.plannedDate;
-  const hasNotes = place.notes || place.meta?.notes;
+  const plannedDate = place.meta?.plannedDate;
+  const hasNotes = place.meta?.notes;
 
   return (
     <li className={`place-item ${highlight ? "highlight" : ""}`}>

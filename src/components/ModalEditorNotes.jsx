@@ -20,7 +20,6 @@ export default function ModalEditorNotes({
   if (!open) return null;
 
   function handleSave() {
-    // console.log("SAVE CLICK", { localNotes, localDate });
     onSave({
       notes: localNotes,
       plannedDate: localDate || null,
