@@ -1,17 +1,54 @@
 # Place Picker Planner
 
 Place Picker Planner is a full-stack React application for selecting, saving, and organizing places that matter to you.
-The project is designed as a real-world, production-oriented application and is developed incrementally through clearly defined commits.
+The project is designed as a real-world, production-oriented application and is developed incrementally through clearly defined commits and versioned phases.
 
-This repository represents the initial baseline phase, focused on cleanup, structure, and branding.
-
----
+## Current Version: v1.1 – Stabilization Phase
 
 ## Demo
 
 Live demo: https://place-picker-planner.netlify.app/
 
 ![Place Picker Planner screenshot](screenshot.png)
+
+---
+
+## Project Status & Versioning
+
+### v1.0 – Baseline (Completed)
+
+v1.0 established a complete, functional application with:
+
+- Full CRUD flow for places
+- Optimistic UI updates
+- Backend persistence using JSON files
+- Clear separation of concerns
+- Production-oriented architecture
+
+No new features are added on top of v1.0 without versioning.
+
+### v1.1 – Stabilization Phase (Current)
+
+v1.1 focuses on **internal safety, predictability, and UX polish**.
+
+Scope of v1.1:
+
+- No new product features
+- No API changes
+- No architectural rewrites
+
+Improvements include:
+
+- Safer optimistic update rollback
+- Improved backend sync reliability
+- Clearer empty and loading states
+- Accessibility improvements (ARIA roles, keyboard semantics)
+- Better modal and dialog behavior
+- Improved internal clarity and documentation
+
+From a user perspective, the application behaves the same as v1.0, but is more robust and polished.
+
+---
 
 ## Local Development Setup
 
@@ -77,76 +114,42 @@ The following files are defined in the project root:
 
 ### Behavior Differences
 
-**Development (`.env.development`)**
+**Development**
 
-- Uses local backend (`localhost`)
-- Resets place status to **“Want to visit”** on each session
-- Enables development-only debugging
+- Uses local backend
+- Resets place status on reload (optional)
+- Enables debug behavior
 
-**Production (`.env.production`)**
+##Production##
 
 - Uses production backend
-- Preserves backend state for place status, notes, and planned dates
-- No development-only logic is applied
+- Preserves backend state
+- No development-only logic
 
-This setup ensures a clean development experience while keeping production behavior stable and predictable for end users.
-
-## Implemented Features
+## Implemented Features (v1.0)
 
 At this stage, the project includes:
 
-- Cleaned and refactored UI (course-specific code removed)
-- Defined place data model (id, title, image, city, category, status)
-- Centralized backend API (places / user-places)
-- Centralized fetch utility with error handling
 - Available Places and My Places views
 - Adding places with optimistic UI updates
 - Removing places with confirmation modal
-- Persistent user-places stored on backend
 - Favorites (star toggle)
 - Place status tracking (want to visit / visited)
-- Notes and planned visit date per place
+- Notes and planned visit date
 - Category filtering and text search
-- Optional map preview for places
-- Responsive layout (mobile to desktop)
+- Optional map preview
+- Responsive layout
+- Global error handling
 - Loading states and fallback UI
-- Basic accessibility support
-- Simple email-based edit mode
-- Route structure with error handling
+- Email-based edit mode
 
-## Styling & Maintainability
+## UX & Accessibility (v1.1)
 
-- CSS refactored into smaller, responsibility-based files
-- index.css acts as a clean entry point
-- Styles separated into animations, modal, forms, components, layout, and responsive rules
-- No visual regressions introduced during refactoring
-
-## Project Goals
-
-- Build a complete, real-world React application
-- Avoid specific or demo-only patterns
-- Focus on clean architecture, maintainability, and UX
-- Incrementally evolve features with meaningful commits
-- Deliver a fully functional v1.0 product
-
----
-
-## Current State (Baseline Phase)
-
-At this stage, the project includes:
-
-- React frontend built with Vite
-- Node.js + Express backend
-- Modularized CSS architecture
-- JSON-based backend persistence
-- Environment-based configuration (dev / prod)
-
----
-
-## Demo
-
-The project is designed to run locally.  
-A live demo will be added after deployment (Netlify).
+- Improved empty and loading states
+- Proper dialog and modal semantics
+- Accessible buttons and toggles
+- Keyboard- and screen-reader-friendly interactions
+- Disabled state consistency
 
 ---
 
@@ -157,7 +160,7 @@ A live demo will be added after deployment (Netlify).
 - React
 - Vite
 - JavaScript (ES6+)
-- CSS
+- CSS (modular)
 
 ### Backend
 
@@ -167,28 +170,67 @@ A live demo will be added after deployment (Netlify).
 
 ---
 
+## Development Principles
+
+- One logical change per commit
+- Strict version boundaries (v1.x vs v2.0)
+- Refactoring without behavioral changes
+- No speculative or demo-only code
+- Production-readiness over tutorials
+
+---
+
+## Roadmap
+
+### v1.1 (Current)
+
+- Stabilization
+- UX & accessibility polish
+- Documentation clarity
+
+### v2.0 (Planned)
+
+- Real authentication
+- Per-user data separation
+- Database-backed persistence
+- Feature expansion
+- Testing infrastructure
+
+---
+
+## Project Structure
+
 ## Project Structure
 
 ```text
 PlacePicker/
 ├── backend/
-│   ├── data/
-│   ├── images/
-│   ├── app.js
+│   ├── data/              # JSON persistence (temporary storage)
+│   ├── images/            # Place images served by backend
+│   ├── app.js             # Express app entry point
 │   └── package.json
 ├── public/
 ├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── styles/
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
+│   ├── assets/            # Static frontend assets (logos, icons)
+│   ├── components/        # Reusable UI components (lists, items, modals)
+│   ├── styles/            # Modular CSS (layout, components, modals, etc.)
+│   ├── views/             # Page-level views (MyPlaces, AvailablePlaces)
+│   ├── utils/             # API and helper utilities
+│   ├── App.jsx            # Root application component
+│   ├── main.jsx           # React entry point
+│   └── index.css          # CSS entry point
 ├── index.html
 ├── vite.config.js
 └── package.json
-
 ```
+
+This structure enforces:
+
+- Clear separation between frontend and backend
+- Isolation of business logic, UI components, and views
+- Scalable organization for future v2.0 expansion
+
+---
 
 ### Development Approach
 
@@ -196,14 +238,6 @@ PlacePicker/
 - Features are added incrementally based on a predefined roadmap
 - Refactoring is treated as a first-class task
 - UI, state logic, and business logic are kept clearly separated
-
-### Roadmap (High-Level)
-
-- Improve accessibility
-- Introduce multi-user backend support
-- Add theming support
-- Prepare production deployment
-- Finalize v1.0 release
 
 ---
 
@@ -222,7 +256,7 @@ This project is under active development.
 
 ## Author
 
-This project is maintained by Duško Vokić.
+This project is maintained by Dusko Vokic.
 You can reach out via:
 
 - GitHub: https://github.com/D-vokic
