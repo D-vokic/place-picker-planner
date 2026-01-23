@@ -19,6 +19,7 @@ export default function PlaceItem({
     <li className={`place-item ${highlight ? "highlight" : ""}`}>
       <div className="place-header">
         <button
+          type="button"
           className="place-image"
           onClick={
             typeof onSelectPlace === "function"
@@ -26,15 +27,23 @@ export default function PlaceItem({
               : undefined
           }
           disabled={disabled}
+          aria-label={`Select ${place.title}`}
         >
           <img src={place.imageUrl} alt={place.imageAlt} />
         </button>
 
         {onToggleFavorite && (
           <button
+            type="button"
             className={`favorite-toggle ${isFavorite ? "active" : ""}`}
             onClick={() => onToggleFavorite(place.id)}
             disabled={disabled}
+            aria-pressed={isFavorite}
+            aria-label={
+              isFavorite
+                ? `Remove ${place.title} from favorites`
+                : `Add ${place.title} to favorites`
+            }
           >
             {isFavorite ? "★" : "☆"}
           </button>
@@ -61,21 +70,31 @@ export default function PlaceItem({
 
       {onToggleStatus && (
         <button
+          type="button"
           className="status-toggle"
           onClick={() => onToggleStatus(place.id)}
           disabled={disabled}
+          aria-label={`Mark ${place.title} as ${
+            place.status === "visited" ? "want to visit" : "visited"
+          }`}
         >
           {place.status === "visited" ? "Visited" : "Want to visit"}
         </button>
       )}
 
-      {plannedDate && <p className="planned-date">Planned: {plannedDate}</p>}
+      {plannedDate && (
+        <p className="planned-date" role="status">
+          Planned: {plannedDate}
+        </p>
+      )}
 
       {onOpenNotes && (
         <button
+          type="button"
           className="notes-btn"
           onClick={() => onOpenNotes(place)}
           disabled={disabled}
+          aria-label={`Open notes for ${place.title}`}
         >
           Notes{hasNotes ? "*" : ""}
         </button>

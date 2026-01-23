@@ -11,7 +11,7 @@ export default function PlacesList({
   highlightedPlaceId,
 }) {
   return (
-    <ul className="places">
+    <ul className="places" aria-live="polite" aria-disabled={disabled}>
       {places.map((place) => (
         <PlaceItem
           key={place.id}

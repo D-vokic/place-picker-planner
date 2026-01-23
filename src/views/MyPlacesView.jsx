@@ -16,21 +16,30 @@ export default function MyPlacesView({
   const hasAnyPlaces = places.length > 0;
 
   return (
-    <section className="places-category">
+    <section className="places-category" aria-busy={isLoading}>
       <div className="places-header">
         <h2>My Places</h2>
         <button
+          type="button"
           className={`fav-filter-btn ${favoriteOnly ? "active" : ""}`}
           onClick={() => setFavoriteOnly(!favoriteOnly)}
+          aria-pressed={favoriteOnly}
+          disabled={isLoading}
         >
           {favoriteOnly ? "⭐ Favorites" : "☆ Favorites"}
         </button>
       </div>
 
-      {isLoading && <p className="fallback-text">Loading your places...</p>}
+      {isLoading && (
+        <p className="fallback-text" role="status">
+          Loading your places…
+        </p>
+      )}
 
       {!isLoading && !hasAnyPlaces && (
-        <p className="fallback-text">You have not added any places yet.</p>
+        <p className="fallback-text">
+          No places yet. Add one from the list below.
+        </p>
       )}
 
       {!isLoading && hasAnyPlaces && (

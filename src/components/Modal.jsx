@@ -6,7 +6,6 @@ function Modal({ open, children, onClose }) {
 
   useEffect(() => {
     const dialog = dialogRef.current;
-
     if (!dialog) return;
 
     if (open && !dialog.open) {
@@ -19,7 +18,12 @@ function Modal({ open, children, onClose }) {
   }, [open]);
 
   return createPortal(
-    <dialog className="modal" ref={dialogRef} onClose={onClose}>
+    <dialog
+      className="modal"
+      ref={dialogRef}
+      onClose={onClose}
+      aria-modal="true"
+    >
       {children}
     </dialog>,
     document.getElementById("modal"),

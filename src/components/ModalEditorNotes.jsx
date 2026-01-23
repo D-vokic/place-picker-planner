@@ -28,28 +28,35 @@ export default function ModalEditorNotes({
   }
 
   return (
-    <div className="notes-modal-overlay" role="dialog">
+    <div
+      className="notes-modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="notes-title"
+    >
       <div className="notes-modal">
-        <h2>Edit Notes</h2>
+        <h2 id="notes-title">Edit Notes</h2>
 
         <textarea
           value={notesDraft}
           placeholder="Write notes..."
           onChange={(e) => setNotesDraft(e.target.value)}
+          aria-label="Notes"
         />
 
         <input
           type="date"
           value={dateDraft}
           onChange={(e) => setDateDraft(e.target.value)}
+          aria-label="Planned visit date"
         />
 
         <div className="btn-row">
-          <button className="btn-cancel" onClick={onClose}>
+          <button type="button" className="btn-cancel" onClick={onClose}>
             Cancel
           </button>
 
-          <button className="btn-save" onClick={handleSave}>
+          <button type="button" className="btn-save" onClick={handleSave}>
             Save
           </button>
         </div>
