@@ -33,6 +33,7 @@ const initialState = {
   userPlaces: [],
   isLoadingUserPlaces: true,
   isDeleteModalOpen: false,
+  lastError: null,
 };
 
 function placesReducer(state, action) {
@@ -46,6 +47,7 @@ function placesReducer(state, action) {
           isFavorite: Boolean(place.isFavorite),
         })),
         isLoadingUserPlaces: false,
+        lastError: null,
       };
 
     case "RESET_USER_STATE":
@@ -54,6 +56,14 @@ function placesReducer(state, action) {
         userPlaces: [],
         isLoadingUserPlaces: false,
         isDeleteModalOpen: false,
+        lastError: null,
+      };
+
+    case "SET_ERROR":
+      return {
+        ...state,
+        lastError: action.message,
+        isLoadingUserPlaces: false,
       };
 
     case "SET_DELETE_MODAL":
@@ -136,6 +146,7 @@ function placesReducer(state, action) {
           ...place,
           isFavorite: Boolean(place.isFavorite),
         })),
+        lastError: null,
       };
 
     default:
@@ -173,8 +184,11 @@ function App() {
       try {
         const data = await fetchUserPlaces();
         dispatch({ type: "LOAD_USER_PLACES", places: data.places });
-      } catch {
-        dispatch({ type: "RESET_USER_STATE" });
+      } catch (error) {
+        dispatch({
+          type: "SET_ERROR",
+          message: error?.message || "Failed to load user places",
+        });
       }
     }
 

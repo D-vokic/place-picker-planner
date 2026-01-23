@@ -32,6 +32,7 @@ export default function AvailablePlacesView({ onSelectPlace }) {
   useEffect(() => {
     async function loadPlaces() {
       setIsFetching(true);
+      setError(null);
 
       try {
         const data = await fetchPlaces();
@@ -49,11 +50,11 @@ export default function AvailablePlacesView({ onSelectPlace }) {
         }));
 
         setAvailablePlaces(normalizedPlaces);
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError(err?.message || "Failed to load places");
+      } finally {
+        setIsFetching(false);
       }
-
-      setIsFetching(false);
     }
 
     loadPlaces();
