@@ -1,11 +1,16 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const DEV_USER_ID = "dev-user";
+
 async function request(endpoint, options = {}) {
   let response;
 
   try {
     response = await fetch(API_BASE_URL + endpoint, {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${DEV_USER_ID}`,
+      },
       ...options,
     });
   } catch {
@@ -18,9 +23,7 @@ async function request(endpoint, options = {}) {
     try {
       const error = await response.json();
       errorMessage = error.message || errorMessage;
-    } catch {
-      /* ignore */
-    }
+    } catch {}
 
     throw new Error(errorMessage);
   }
