@@ -13,10 +13,42 @@ const IMAGES_DIR = path.join(process.cwd(), "images");
 
 app.use("/images", express.static(IMAGES_DIR));
 
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization required." });
+  }
+
+  const [, userId] = authHeader.split(" ");
+
+  if (!userId) {
+    return res.status(401).json({ message: "Invalid authorization header." });
+  }
+
+  req.user = {
+    id: userId,
+    role: "user",
+    isAuthenticated: true,
+  };
+
+  next();
+}
+
+app.use(authMiddleware);
+
+function getUserPlacesFile(req) {
+  return `user-places-${req.user.id}.json`;
+}
+
 async function readJSON(fileName) {
   const filePath = path.join(DATA_DIR, fileName);
-  const data = await fs.readFile(filePath, "utf-8");
-  return JSON.parse(data);
+  try {
+    const data = await fs.readFile(filePath, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
 }
 
 async function writeJSON(fileName, data) {
@@ -35,7 +67,7 @@ app.get("/places", async (req, res) => {
 
 app.get("/user-places", async (req, res) => {
   try {
-    const places = await readJSON("user-places.json");
+    const places = await readJSON(getUserPlacesFile(req));
     res.json({ places });
   } catch {
     res.status(500).json({ message: "Failed to load user places." });
@@ -50,7 +82,8 @@ app.post("/user-places", async (req, res) => {
   }
 
   try {
-    const userPlaces = await readJSON("user-places.json");
+    const fileName = getUserPlacesFile(req);
+    const userPlaces = await readJSON(fileName);
 
     if (userPlaces.some((p) => p.id === place.id)) {
       return res.status(409).json({ message: "Place already added." });
@@ -63,7 +96,7 @@ app.post("/user-places", async (req, res) => {
     };
 
     userPlaces.unshift(placeToStore);
-    await writeJSON("user-places.json", userPlaces);
+    await writeJSON(fileName, userPlaces);
 
     res.status(201).json({ place: placeToStore });
   } catch {
@@ -75,7 +108,8 @@ app.patch("/user-places/:id/status", async (req, res) => {
   const placeId = req.params.id;
 
   try {
-    const userPlaces = await readJSON("user-places.json");
+    const fileName = getUserPlacesFile(req);
+    const userPlaces = await readJSON(fileName);
     const place = userPlaces.find((p) => p.id === placeId);
 
     if (!place) {
@@ -84,7 +118,7 @@ app.patch("/user-places/:id/status", async (req, res) => {
 
     place.status = place.status === "visited" ? "want" : "visited";
 
-    await writeJSON("user-places.json", userPlaces);
+    await writeJSON(fileName, userPlaces);
     res.json({ place });
   } catch {
     res.status(500).json({ message: "Failed to update place status." });
@@ -95,7 +129,8 @@ app.patch("/user-places/:id/favorite", async (req, res) => {
   const placeId = req.params.id;
 
   try {
-    const userPlaces = await readJSON("user-places.json");
+    const fileName = getUserPlacesFile(req);
+    const userPlaces = await readJSON(fileName);
     const place = userPlaces.find((p) => p.id === placeId);
 
     if (!place) {
@@ -104,7 +139,7 @@ app.patch("/user-places/:id/favorite", async (req, res) => {
 
     place.isFavorite = !place.isFavorite;
 
-    await writeJSON("user-places.json", userPlaces);
+    await writeJSON(fileName, userPlaces);
     res.json({ place });
   } catch {
     res.status(500).json({ message: "Failed to toggle favorite." });
@@ -116,7 +151,8 @@ app.patch("/user-places/:id", async (req, res) => {
   const { meta } = req.body;
 
   try {
-    const userPlaces = await readJSON("user-places.json");
+    const fileName = getUserPlacesFile(req);
+    const userPlaces = await readJSON(fileName);
     const place = userPlaces.find((p) => p.id === placeId);
 
     if (!place) {
@@ -128,7 +164,7 @@ app.patch("/user-places/:id", async (req, res) => {
       ...(meta || {}),
     };
 
-    await writeJSON("user-places.json", userPlaces);
+    await writeJSON(fileName, userPlaces);
     res.json({ place });
   } catch {
     res.status(500).json({ message: "Failed to update place meta." });
@@ -139,10 +175,11 @@ app.delete("/user-places/:id", async (req, res) => {
   const placeId = req.params.id;
 
   try {
-    const userPlaces = await readJSON("user-places.json");
+    const fileName = getUserPlacesFile(req);
+    const userPlaces = await readJSON(fileName);
     const updatedPlaces = userPlaces.filter((p) => p.id !== placeId);
 
-    await writeJSON("user-places.json", updatedPlaces);
+    await writeJSON(fileName, updatedPlaces);
     res.json({ message: "Place removed." });
   } catch {
     res.status(500).json({ message: "Failed to remove place." });
