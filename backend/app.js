@@ -28,107 +28,92 @@ await db.exec(`
 `);
 
 await db.exec(`
-  CREATE TABLE IF NOT EXISTS user_places (
+  CREATE TABLE IF NOT EXISTS collections (
     id TEXT,
     user_id TEXT,
-    data TEXT,
+    title TEXT,
     PRIMARY KEY (id, user_id)
   );
 `);
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS user_places (
+    id TEXT,
+    user_id TEXT,
+    collection_id TEXT,
+    data TEXT,
+    PRIMARY KEY (id, user_id, collection_id)
+  );
+`);
+
+async function ensureDefaultCollection() {
+  const rows = await db.all("SELECT DISTINCT user_id FROM user_places");
+  for (const row of rows) {
+    await db.run(
+      "INSERT OR IGNORE INTO collections (id, user_id, title) VALUES (?, ?, ?)",
+      "default",
+      row.user_id,
+      "My Places",
+    );
+
+    await db.run(
+      "UPDATE user_places SET collection_id = ? WHERE collection_id IS NULL AND user_id = ?",
+      "default",
+      row.user_id,
+    );
+  }
+}
+
+await ensureDefaultCollection();
 
 const userPlacesRepo = createUserPlacesRepository(db);
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
-
   if (!authHeader) {
     return res.status(401).json({ message: "Authorization required." });
   }
 
   const [, userId] = authHeader.split(" ");
-
   if (!userId) {
     return res.status(401).json({ message: "Invalid authorization header." });
   }
 
-  req.user = {
-    id: userId,
-    role: "user",
-    isAuthenticated: true,
-  };
-
+  req.user = { id: userId };
   next();
 }
 
 app.use(authMiddleware);
 
-app.get("/places", async (req, res) => {
-  const rows = await db.all("SELECT data FROM places");
-  const places = rows.map((r) => JSON.parse(r.data));
+app.get("/collections", async (req, res) => {
+  const rows = await db.all(
+    "SELECT id, title FROM collections WHERE user_id = ?",
+    req.user.id,
+  );
+  res.json({ collections: rows });
+});
+
+app.get("/collections/:collectionId/places", async (req, res) => {
+  const places = await userPlacesRepo.getAllByUserAndCollection(
+    req.user.id,
+    req.params.collectionId,
+  );
   res.json({ places });
 });
 
-app.get("/user-places", async (req, res) => {
-  const places = await userPlacesRepo.getAllByUser(req.user.id);
-  res.json({ places });
-});
-
-app.post("/user-places", async (req, res) => {
+app.post("/collections/:collectionId/places", async (req, res) => {
   const place = req.body.place;
-
   if (!place || !place.id) {
     return res.status(400).json({ message: "Invalid place data." });
   }
 
-  const stored = await userPlacesRepo.add(req.user.id, place);
+  const stored = await userPlacesRepo.add(
+    req.user.id,
+    req.params.collectionId,
+    place,
+  );
+
   res.status(201).json({ place: stored });
-});
-
-app.patch("/user-places/:id/status", async (req, res) => {
-  const place = await userPlacesRepo.getById(req.user.id, req.params.id);
-
-  if (!place) {
-    return res.status(404).json({ message: "Place not found." });
-  }
-
-  place.status = place.status === "visited" ? "want" : "visited";
-  await userPlacesRepo.update(req.user.id, req.params.id, place);
-
-  res.json({ place });
-});
-
-app.patch("/user-places/:id/favorite", async (req, res) => {
-  const place = await userPlacesRepo.getById(req.user.id, req.params.id);
-
-  if (!place) {
-    return res.status(404).json({ message: "Place not found." });
-  }
-
-  place.isFavorite = !place.isFavorite;
-  await userPlacesRepo.update(req.user.id, req.params.id, place);
-
-  res.json({ place });
-});
-
-app.patch("/user-places/:id", async (req, res) => {
-  const place = await userPlacesRepo.getById(req.user.id, req.params.id);
-
-  if (!place) {
-    return res.status(404).json({ message: "Place not found." });
-  }
-
-  place.meta = {
-    ...(place.meta || {}),
-    ...(req.body.meta || {}),
-  };
-
-  await userPlacesRepo.update(req.user.id, req.params.id, place);
-  res.json({ place });
-});
-
-app.delete("/user-places/:id", async (req, res) => {
-  await userPlacesRepo.remove(req.user.id, req.params.id);
-  res.json({ message: "Place removed." });
 });
 
 app.listen(3000, () => {

@@ -1,6 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DEV_USER_ID = "dev-user";
+const DEFAULT_COLLECTION_ID = "default";
 
 async function request(endpoint, options = {}) {
   let response;
@@ -35,46 +36,47 @@ async function request(endpoint, options = {}) {
   return response.json();
 }
 
-const ENDPOINTS = {
-  PLACES: "/places",
-  USER_PLACES: "/user-places",
-};
-
 export function fetchPlaces() {
-  return request(ENDPOINTS.PLACES);
+  return request("/places");
 }
 
 export function fetchUserPlaces() {
-  return request(ENDPOINTS.USER_PLACES);
+  return request(`/collections/${DEFAULT_COLLECTION_ID}/places`);
 }
 
 export function addUserPlace(place) {
-  return request(ENDPOINTS.USER_PLACES, {
+  return request(`/collections/${DEFAULT_COLLECTION_ID}/places`, {
     method: "POST",
     body: JSON.stringify({ place }),
   });
 }
 
 export function removeUserPlace(placeId) {
-  return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
+  return request(`/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}`, {
     method: "DELETE",
   });
 }
 
 export function togglePlaceStatus(placeId) {
-  return request(`${ENDPOINTS.USER_PLACES}/${placeId}/status`, {
-    method: "PATCH",
-  });
+  return request(
+    `/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}/status`,
+    {
+      method: "PATCH",
+    },
+  );
 }
 
 export function togglePlaceFavorite(placeId) {
-  return request(`${ENDPOINTS.USER_PLACES}/${placeId}/favorite`, {
-    method: "PATCH",
-  });
+  return request(
+    `/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}/favorite`,
+    {
+      method: "PATCH",
+    },
+  );
 }
 
 export function updatePlaceMeta(placeId, meta) {
-  return request(`${ENDPOINTS.USER_PLACES}/${placeId}`, {
+  return request(`/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}`, {
     method: "PATCH",
     body: JSON.stringify({ meta }),
   });
