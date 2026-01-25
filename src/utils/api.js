@@ -1,87 +1,73 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DEV_USER_ID = "dev-user";
-const DEFAULT_COLLECTION_ID = "default";
 
 async function request(endpoint, options = {}) {
-  let response;
-
-  try {
-    response = await fetch(API_BASE_URL + endpoint, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEV_USER_ID}`,
-      },
-      ...options,
-    });
-  } catch {
-    throw new Error("Network error");
-  }
+  const response = await fetch(API_BASE_URL + endpoint, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${DEV_USER_ID}`,
+    },
+    ...options,
+  });
 
   if (!response.ok) {
-    let errorMessage = "Request failed";
-
+    let message = "Request failed";
     try {
-      const error = await response.json();
-      errorMessage = error.message || errorMessage;
+      const err = await response.json();
+      message = err.message || message;
     } catch {}
-
-    throw new Error(errorMessage);
+    throw new Error(message);
   }
 
-  if (response.status === 204) {
-    return null;
-  }
-
+  if (response.status === 204) return null;
   return response.json();
 }
+
+/* ===== STABLE V1 API ===== */
 
 export function fetchPlaces() {
   return request("/places");
 }
 
 export function fetchUserPlaces() {
-  return request(`/collections/${DEFAULT_COLLECTION_ID}/places`);
+  return request("/user-places");
 }
 
 export function addUserPlace(place) {
-  return request(`/collections/${DEFAULT_COLLECTION_ID}/places`, {
+  return request("/user-places", {
     method: "POST",
     body: JSON.stringify({ place }),
   });
 }
 
 export function removeUserPlace(placeId) {
-  return request(`/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}`, {
+  return request(`/user-places/${placeId}`, {
     method: "DELETE",
   });
 }
 
 export function togglePlaceStatus(placeId) {
-  return request(
-    `/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}/status`,
-    {
-      method: "PATCH",
-    },
-  );
+  return request(`/user-places/${placeId}/status`, {
+    method: "PATCH",
+  });
 }
 
 export function togglePlaceFavorite(placeId) {
-  return request(
-    `/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}/favorite`,
-    {
-      method: "PATCH",
-    },
-  );
+  return request(`/user-places/${placeId}/favorite`, {
+    method: "PATCH",
+  });
 }
 
 export function updatePlaceMeta(placeId, meta) {
-  return request(`/collections/${DEFAULT_COLLECTION_ID}/places/${placeId}`, {
+  return request(`/user-places/${placeId}`, {
     method: "PATCH",
     body: JSON.stringify({ meta }),
   });
 }
 
+/* ===== EXPORT (RESTORED) ===== */
+
 export function exportCollection() {
-  return request(`/collections/${DEFAULT_COLLECTION_ID}/export`);
+  return request("/user-places");
 }

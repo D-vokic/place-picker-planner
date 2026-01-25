@@ -3,7 +3,6 @@ import path from "path";
 import cors from "cors";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
-import createUserPlacesRepository from "./data/userPlacesRepository.js";
 
 const app = express();
 
@@ -20,6 +19,8 @@ const db = await open({
   driver: sqlite3.Database,
 });
 
+/* ===== SCHEMA ===== */
+
 await db.exec(`
   CREATE TABLE IF NOT EXISTS places (
     id TEXT PRIMARY KEY,
@@ -28,120 +29,173 @@ await db.exec(`
 `);
 
 await db.exec(`
-  CREATE TABLE IF NOT EXISTS collections (
-    id TEXT,
-    user_id TEXT,
-    title TEXT,
-    PRIMARY KEY (id, user_id)
-  );
-`);
-
-await db.exec(`
   CREATE TABLE IF NOT EXISTS user_places (
-    id TEXT,
     user_id TEXT,
     collection_id TEXT,
-    data TEXT,
-    PRIMARY KEY (id, user_id, collection_id)
+    data TEXT
   );
 `);
 
-async function ensureDefaultCollection() {
-  const rows = await db.all("SELECT DISTINCT user_id FROM user_places");
-  for (const row of rows) {
-    await db.run(
-      "INSERT OR IGNORE INTO collections (id, user_id, title) VALUES (?, ?, ?)",
-      "default",
-      row.user_id,
-      "My Places",
-    );
-
-    await db.run(
-      "UPDATE user_places SET collection_id = ? WHERE collection_id IS NULL AND user_id = ?",
-      "default",
-      row.user_id,
-    );
-  }
-}
-
-await ensureDefaultCollection();
-
-const userPlacesRepo = createUserPlacesRepository(db);
+/* ===== AUTH ===== */
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ message: "Authorization required." });
   }
-
   const [, userId] = authHeader.split(" ");
   if (!userId) {
     return res.status(401).json({ message: "Invalid authorization header." });
   }
-
   req.user = { id: userId };
   next();
 }
 
 app.use(authMiddleware);
 
-app.get("/collections", async (req, res) => {
+/* ===== STABLE V1 ENDPOINTS ===== */
+
+app.get("/places", async (req, res) => {
+  const rows = await db.all("SELECT data FROM places");
+  res.json({ places: rows.map((r) => JSON.parse(r.data)) });
+});
+
+app.get("/user-places", async (req, res) => {
   const rows = await db.all(
-    "SELECT id, title FROM collections WHERE user_id = ?",
+    `SELECT data FROM user_places
+     WHERE user_id = ?`,
     req.user.id,
   );
-  res.json({ collections: rows });
+  res.json({ places: rows.map((r) => JSON.parse(r.data)) });
 });
 
-app.get("/collections/:collectionId/places", async (req, res) => {
-  const places = await userPlacesRepo.getAllByUserAndCollection(
-    req.user.id,
-    req.params.collectionId,
-  );
-  res.json({ places });
-});
-
-app.post("/collections/:collectionId/places", async (req, res) => {
+app.post("/user-places", async (req, res) => {
   const place = req.body.place;
-  if (!place || !place.id) {
+  if (!place?.id) {
     return res.status(400).json({ message: "Invalid place data." });
   }
 
-  const stored = await userPlacesRepo.add(
+  await db.run(
+    `INSERT INTO user_places (user_id, collection_id, data)
+     VALUES (?, ?, ?)`,
     req.user.id,
-    req.params.collectionId,
-    place,
+    "default",
+    JSON.stringify({
+      ...place,
+      status: "want",
+      isFavorite: false,
+      meta: place.meta ?? {},
+    }),
   );
 
-  res.status(201).json({ place: stored });
+  res.status(201).json({ place });
 });
 
-app.get("/collections/:collectionId/export", async (req, res) => {
-  const collectionId = req.params.collectionId;
-
-  const collection = await db.get(
-    "SELECT id, title FROM collections WHERE id = ? AND user_id = ?",
-    collectionId,
+app.patch("/user-places/:id/status", async (req, res) => {
+  const row = await db.get(
+    `SELECT rowid, data FROM user_places
+   WHERE user_id = ?
+     AND json_extract(data, '$.id') = ?`,
     req.user.id,
+    req.params.id,
   );
 
-  if (!collection) {
-    return res.status(404).json({ message: "Collection not found." });
+  if (!row) {
+    return res.status(404).json({ message: "Place not found." });
   }
 
-  const places = await userPlacesRepo.getAllByUserAndCollection(
-    req.user.id,
-    collectionId,
+  const place = JSON.parse(row.data);
+  place.status = place.status === "visited" ? "want" : "visited";
+
+  await db.run(
+    `UPDATE user_places
+     SET data = ?
+     WHERE rowid = ?`,
+    JSON.stringify(place),
+    row.rowid,
   );
 
-  res.json({
-    collection: {
-      id: collection.id,
-      title: collection.title,
-    },
-    places,
-  });
+  res.json({ place });
 });
+
+app.patch("/user-places/:id", async (req, res) => {
+  const row = await db.get(
+    `SELECT rowid, data FROM user_places
+     WHERE user_id = ?
+       AND json_extract(data, '$.id') = ?`,
+    req.user.id,
+    req.params.id,
+  );
+
+  if (!row) {
+    return res.status(404).json({ message: "Place not found." });
+  }
+
+  const place = JSON.parse(row.data);
+  place.meta = {
+    ...(place.meta || {}),
+    ...(req.body.meta || {}),
+  };
+
+  await db.run(
+    `UPDATE user_places
+     SET data = ?
+     WHERE rowid = ?`,
+    JSON.stringify(place),
+    row.rowid,
+  );
+
+  res.json({ place });
+});
+
+app.patch("/user-places/:id/favorite", async (req, res) => {
+  const row = await db.get(
+    `SELECT rowid, data FROM user_places
+     WHERE user_id = ?
+       AND json_extract(data, '$.id') = ?`,
+    req.user.id,
+    req.params.id,
+  );
+
+  if (!row) {
+    return res.status(404).json({ message: "Place not found." });
+  }
+
+  const place = JSON.parse(row.data);
+  place.isFavorite = !place.isFavorite;
+
+  await db.run(
+    `UPDATE user_places
+     SET data = ?
+     WHERE rowid = ?`,
+    JSON.stringify(place),
+    row.rowid,
+  );
+
+  res.json({ place });
+});
+
+app.delete("/user-places/:id", async (req, res) => {
+  await db.run(
+    `DELETE FROM user_places
+     WHERE user_id = ?
+       AND json_extract(data, '$.id') = ?`,
+    req.user.id,
+    req.params.id,
+  );
+
+  res.json({ message: "Place removed." });
+});
+
+/* ===== V2 ALIAS (NO BREAKAGE) ===== */
+
+app.patch(
+  "/collections/:collectionId/places/:placeId/status",
+  async (req, res) => {
+    req.params.id = req.params.placeId;
+    return app._router.handle(req, res, () => {});
+  },
+);
 
 app.listen(3000, () => {
   console.log("Backend running on http://localhost:3000");

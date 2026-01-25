@@ -99,24 +99,50 @@
 
 .fav-filter-btn {
   background: none;
-  border: none;
-  font-size: 0.9rem;
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  font-size: 0.85rem;
   cursor: pointer;
-  opacity: 0.8;
+  opacity: 0.85;
   margin-bottom: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  color: #8feeff;
 }
 .fav-filter-btn[aria-pressed="true"] {
   opacity: 1;
   font-weight: 600;
+  background: rgba(0, 255, 255, 0.15);
 }
 
-.button {
-  cursor: pointer;
+/* ===== EXPORT BUTTONS ===== */
+
+.places-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.places-header button {
   font-family: "Raleway", sans-serif;
-  font-size: 0.95rem;
-  padding: 0.5rem 1.25rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #5d0909;
-  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 255, 255, 0.35);
+  background: transparent;
+  color: #8feeff;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.places-header button:hover {
+  background: rgba(0, 255, 255, 0.18);
+}
+
+.places-header button:active {
+  transform: translateY(1px);
+}
+
+.places-header button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
