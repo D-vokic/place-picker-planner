@@ -81,3 +81,7 @@ export function updatePlaceMeta(placeId, meta) {
     body: JSON.stringify({ meta }),
   });
 }
+
+export function exportCollection() {
+  return request(`/collections/${DEFAULT_COLLECTION_ID}/export`);
+}

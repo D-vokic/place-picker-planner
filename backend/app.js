@@ -116,6 +116,33 @@ app.post("/collections/:collectionId/places", async (req, res) => {
   res.status(201).json({ place: stored });
 });
 
+app.get("/collections/:collectionId/export", async (req, res) => {
+  const collectionId = req.params.collectionId;
+
+  const collection = await db.get(
+    "SELECT id, title FROM collections WHERE id = ? AND user_id = ?",
+    collectionId,
+    req.user.id,
+  );
+
+  if (!collection) {
+    return res.status(404).json({ message: "Collection not found." });
+  }
+
+  const places = await userPlacesRepo.getAllByUserAndCollection(
+    req.user.id,
+    collectionId,
+  );
+
+  res.json({
+    collection: {
+      id: collection.id,
+      title: collection.title,
+    },
+    places,
+  });
+});
+
 app.listen(3000, () => {
   console.log("Backend running on http://localhost:3000");
 });
