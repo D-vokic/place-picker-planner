@@ -16,22 +16,26 @@ export default function MyPlacesView({
   recentlyAddedPlaceId,
 }) {
   const hasAnyPlaces = places.length > 0;
-
   const [exportStatus, setExportStatus] = useState(null);
 
   async function handleExportDownload() {
     try {
       setExportStatus("downloading");
       const data = await exportCollection();
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
+
+      const blob = new Blob([JSON.stringify(data.places, null, 2)], {
         type: "application/json",
       });
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = "my-places.json";
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
       setExportStatus("downloaded");
     } catch {
       setExportStatus("error");
@@ -41,7 +45,7 @@ export default function MyPlacesView({
   async function handleCopyExportLink() {
     try {
       setExportStatus("copying");
-      const link = `${window.location.origin}/collections/default/export`;
+      const link = `${window.location.origin}/export/my-places`;
       await navigator.clipboard.writeText(link);
       setExportStatus("copied");
     } catch {
@@ -69,7 +73,7 @@ export default function MyPlacesView({
             type="button"
             className="export-btn"
             onClick={handleExportDownload}
-            disabled={isLoading || !hasAnyPlaces}
+            disabled={!hasAnyPlaces || isLoading}
           >
             Download JSON
           </button>
@@ -78,7 +82,7 @@ export default function MyPlacesView({
             type="button"
             className="export-btn secondary"
             onClick={handleCopyExportLink}
-            disabled={isLoading || !hasAnyPlaces}
+            disabled={!hasAnyPlaces || isLoading}
           >
             Copy export link
           </button>
@@ -90,7 +94,9 @@ export default function MyPlacesView({
       )}
 
       {exportStatus === "downloaded" && (
-        <p className="fallback-text success">Collection exported as JSON.</p>
+        <p className="fallback-text success">
+          Collection exported successfully.
+        </p>
       )}
 
       {exportStatus === "copying" && (
