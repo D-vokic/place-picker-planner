@@ -249,8 +249,32 @@ function App() {
       result.sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status));
     }
 
+    if (sortState.by === "plannedDate") {
+      result.sort((a, b) => {
+        const aDate = a.meta?.plannedDate
+          ? new Date(a.meta.plannedDate).getTime()
+          : Infinity;
+        const bDate = b.meta?.plannedDate
+          ? new Date(b.meta.plannedDate).getTime()
+          : Infinity;
+
+        return sortState.direction === "asc" ? aDate - bDate : bDate - aDate;
+      });
+    }
+
     return result;
   }, [userPlaces, filterState, sortState]);
+
+  function handleToggleSortByPlannedDate() {
+    setSortState((s) =>
+      s.by !== "plannedDate"
+        ? { by: "plannedDate", direction: "asc" }
+        : {
+            by: "plannedDate",
+            direction: s.direction === "asc" ? "desc" : "asc",
+          },
+    );
+  }
 
   function handleToggleSortByTitle() {
     setSortState((s) =>
@@ -416,6 +440,7 @@ function App() {
                   sortState={sortState}
                   onToggleSortByTitle={handleToggleSortByTitle}
                   onToggleSortByStatus={handleToggleSortByStatus}
+                  onToggleSortByPlannedDate={handleToggleSortByPlannedDate}
                   recentlyAddedPlaceId={recentlyAddedPlaceId}
                 />
               ) : (
