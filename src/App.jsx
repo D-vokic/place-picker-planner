@@ -240,8 +240,39 @@ function App() {
       });
     }
 
+    if (sortState.by === "status") {
+      const order =
+        sortState.direction === "asc"
+          ? ["want", "visited"]
+          : ["visited", "want"];
+
+      result.sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status));
+    }
+
     return result;
   }, [userPlaces, filterState, sortState]);
+
+  function handleToggleSortByTitle() {
+    setSortState((s) =>
+      s.by !== "title"
+        ? { by: "title", direction: "asc" }
+        : {
+            by: "title",
+            direction: s.direction === "asc" ? "desc" : "asc",
+          },
+    );
+  }
+
+  function handleToggleSortByStatus() {
+    setSortState((s) =>
+      s.by !== "status"
+        ? { by: "status", direction: "asc" }
+        : {
+            by: "status",
+            direction: s.direction === "asc" ? "desc" : "asc",
+          },
+    );
+  }
 
   function handleEmailSubmit(e) {
     e.preventDefault();
@@ -382,13 +413,9 @@ function App() {
                   setFavoriteOnly={(v) =>
                     setFilterState((s) => ({ ...s, favoritesOnly: v }))
                   }
-                  sortDirection={sortState.direction}
-                  onToggleSortDirection={() =>
-                    setSortState((s) => ({
-                      ...s,
-                      direction: s.direction === "asc" ? "desc" : "asc",
-                    }))
-                  }
+                  sortState={sortState}
+                  onToggleSortByTitle={handleToggleSortByTitle}
+                  onToggleSortByStatus={handleToggleSortByStatus}
                   recentlyAddedPlaceId={recentlyAddedPlaceId}
                 />
               ) : (

@@ -12,9 +12,9 @@ export default function PlacesList({
 }) {
   return (
     <ul className="places" aria-live="polite" aria-disabled={disabled}>
-      {places.map((place) => (
+      {places.map((place, index) => (
         <PlaceItem
-          key={place.id}
+          key={`${place.id}-${place.status}-${index}`}
           place={place}
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}

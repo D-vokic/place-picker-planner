@@ -13,8 +13,9 @@ export default function MyPlacesView({
   onOpenNotes,
   favoriteOnly,
   setFavoriteOnly,
-  sortDirection,
-  onToggleSortDirection,
+  sortState,
+  onToggleSortByStatus,
+  onToggleSortByTitle,
   recentlyAddedPlaceId,
 }) {
   const hasAnyPlaces = places.length > 0;
@@ -55,6 +56,20 @@ export default function MyPlacesView({
     }
   }
 
+  const statusLabel =
+    sortState.by === "status"
+      ? sortState.direction === "asc"
+        ? "Want → Visited"
+        : "Visited → Want"
+      : "Status";
+
+  const titleLabel =
+    sortState.by === "title"
+      ? sortState.direction === "asc"
+        ? "A–Z"
+        : "Z–A"
+      : "A–Z";
+
   return (
     <section className="places-category" aria-busy={isLoading}>
       <div className="places-header">
@@ -73,11 +88,20 @@ export default function MyPlacesView({
 
           <button
             type="button"
-            className="sort-btn"
-            onClick={onToggleSortDirection}
+            className={`sort-btn ${sortState.by === "title" ? "active" : ""}`}
+            onClick={onToggleSortByTitle}
             disabled={isLoading}
           >
-            {sortDirection === "asc" ? "A–Z" : "Z–A"}
+            {titleLabel}
+          </button>
+
+          <button
+            type="button"
+            className={`sort-btn ${sortState.by === "status" ? "active" : ""}`}
+            onClick={onToggleSortByStatus}
+            disabled={isLoading}
+          >
+            {statusLabel}
           </button>
 
           <button
