@@ -13,6 +13,8 @@ export default function MyPlacesView({
   onOpenNotes,
   favoriteOnly,
   setFavoriteOnly,
+  sortDirection,
+  onToggleSortDirection,
   recentlyAddedPlaceId,
 }) {
   const hasAnyPlaces = places.length > 0;
@@ -67,6 +69,15 @@ export default function MyPlacesView({
             disabled={isLoading}
           >
             {favoriteOnly ? "⭐ Favorites" : "☆ Favorites"}
+          </button>
+
+          <button
+            type="button"
+            className="sort-btn"
+            onClick={onToggleSortDirection}
+            disabled={isLoading}
+          >
+            {sortDirection === "asc" ? "A–Z" : "Z–A"}
           </button>
 
           <button
@@ -134,7 +145,7 @@ export default function MyPlacesView({
           onOpenNotes={onOpenNotes}
           disabled={isLoading}
           showMapPreview={MAP_PREVIEW_ENABLED}
-          recentlyAddedPlaceId={recentlyAddedPlaceId}
+          highlightedPlaceId={recentlyAddedPlaceId}
         />
       )}
     </section>

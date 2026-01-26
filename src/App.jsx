@@ -155,6 +155,11 @@ function App() {
     search: "",
   });
 
+  const [sortState, setSortState] = useState({
+    by: "title",
+    direction: "asc",
+  });
+
   const [recentlyAddedPlaceId, setRecentlyAddedPlaceId] = useState(null);
   const [notesModalOpen, setNotesModalOpen] = useState(false);
 
@@ -228,8 +233,15 @@ function App() {
       );
     }
 
+    if (sortState.by === "title") {
+      result.sort((a, b) => {
+        const cmp = a.title.localeCompare(b.title);
+        return sortState.direction === "asc" ? cmp : -cmp;
+      });
+    }
+
     return result;
-  }, [userPlaces, filterState]);
+  }, [userPlaces, filterState, sortState]);
 
   function handleEmailSubmit(e) {
     e.preventDefault();
@@ -369,6 +381,13 @@ function App() {
                   favoriteOnly={filterState.favoritesOnly}
                   setFavoriteOnly={(v) =>
                     setFilterState((s) => ({ ...s, favoritesOnly: v }))
+                  }
+                  sortDirection={sortState.direction}
+                  onToggleSortDirection={() =>
+                    setSortState((s) => ({
+                      ...s,
+                      direction: s.direction === "asc" ? "desc" : "asc",
+                    }))
                   }
                   recentlyAddedPlaceId={recentlyAddedPlaceId}
                 />

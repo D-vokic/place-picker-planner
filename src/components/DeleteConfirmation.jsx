@@ -6,7 +6,7 @@ export default function DeleteConfirmation({ onCancel, onConfirm }) {
         Are you sure you want to remove this place from your list? This action
         cannot be undone.
       </p>
-      <div id="confirmation-actions">
+      <div className="confirmation-actions">
         <button
           type="button"
           onClick={onCancel}
