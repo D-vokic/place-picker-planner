@@ -233,42 +233,42 @@ function App() {
       );
     }
 
-    if (sortState.by === "title") {
-      result.sort((a, b) => {
+    result.sort((a, b) => {
+      if (a.isFavorite !== b.isFavorite) {
+        return a.isFavorite ? -1 : 1;
+      }
+
+      if (sortState.by === "title") {
         const cmp = a.title.localeCompare(b.title);
         return sortState.direction === "asc" ? cmp : -cmp;
-      });
-    }
+      }
 
-    if (sortState.by === "status") {
-      const order =
-        sortState.direction === "asc"
-          ? ["want", "visited"]
-          : ["visited", "want"];
+      if (sortState.by === "status") {
+        const order =
+          sortState.direction === "asc"
+            ? ["want", "visited"]
+            : ["visited", "want"];
+        return order.indexOf(a.status) - order.indexOf(b.status);
+      }
 
-      result.sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status));
-    }
-
-    if (sortState.by === "plannedDate") {
-      result.sort((a, b) => {
+      if (sortState.by === "plannedDate") {
         const aDate = a.meta?.plannedDate
           ? new Date(a.meta.plannedDate).getTime()
           : Infinity;
         const bDate = b.meta?.plannedDate
           ? new Date(b.meta.plannedDate).getTime()
           : Infinity;
-
         return sortState.direction === "asc" ? aDate - bDate : bDate - aDate;
-      });
-    }
+      }
 
-    if (sortState.by === "createdAt") {
-      result.sort((a, b) => {
+      if (sortState.by === "createdAt") {
         const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return sortState.direction === "asc" ? aTime - bTime : bTime - aTime;
-      });
-    }
+      }
+
+      return 0;
+    });
 
     return result;
   }, [userPlaces, filterState, sortState]);
