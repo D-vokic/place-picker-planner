@@ -262,6 +262,14 @@ function App() {
       });
     }
 
+    if (sortState.by === "createdAt") {
+      result.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return sortState.direction === "asc" ? aTime - bTime : bTime - aTime;
+      });
+    }
+
     return result;
   }, [userPlaces, filterState, sortState]);
 
@@ -293,6 +301,17 @@ function App() {
         ? { by: "status", direction: "asc" }
         : {
             by: "status",
+            direction: s.direction === "asc" ? "desc" : "asc",
+          },
+    );
+  }
+
+  function handleToggleSortByCreatedAt() {
+    setSortState((s) =>
+      s.by !== "createdAt"
+        ? { by: "createdAt", direction: "desc" }
+        : {
+            by: "createdAt",
             direction: s.direction === "asc" ? "desc" : "asc",
           },
     );
@@ -441,6 +460,7 @@ function App() {
                   onToggleSortByTitle={handleToggleSortByTitle}
                   onToggleSortByStatus={handleToggleSortByStatus}
                   onToggleSortByPlannedDate={handleToggleSortByPlannedDate}
+                  onToggleSortByCreatedAt={handleToggleSortByCreatedAt}
                   recentlyAddedPlaceId={recentlyAddedPlaceId}
                 />
               ) : (

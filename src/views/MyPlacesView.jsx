@@ -17,6 +17,7 @@ export default function MyPlacesView({
   onToggleSortByStatus,
   onToggleSortByTitle,
   onToggleSortByPlannedDate,
+  onToggleSortByCreatedAt,
   recentlyAddedPlaceId,
 }) {
   const hasAnyPlaces = places.length > 0;
@@ -71,12 +72,19 @@ export default function MyPlacesView({
         : "Visited → Want"
       : "Status";
 
-  const dateLabel =
+  const plannedDateLabel =
     sortState.by === "plannedDate"
       ? sortState.direction === "asc"
         ? "Earliest planned"
         : "Latest planned"
       : "Planned date";
+
+  const createdAtLabel =
+    sortState.by === "createdAt"
+      ? sortState.direction === "desc"
+        ? "Recently added"
+        : "Oldest first"
+      : "Added";
 
   return (
     <section className="places-category" aria-busy={isLoading}>
@@ -96,6 +104,15 @@ export default function MyPlacesView({
 
           <button
             type="button"
+            className={`sort-btn ${sortState.by === "createdAt" ? "active" : ""}`}
+            onClick={onToggleSortByCreatedAt}
+            disabled={isLoading}
+          >
+            {createdAtLabel}
+          </button>
+
+          <button
+            type="button"
             className={`sort-btn ${sortState.by === "title" ? "active" : ""}`}
             onClick={onToggleSortByTitle}
             disabled={isLoading}
@@ -111,7 +128,7 @@ export default function MyPlacesView({
             onClick={onToggleSortByPlannedDate}
             disabled={isLoading}
           >
-            {dateLabel}
+            {plannedDateLabel}
           </button>
 
           <button
