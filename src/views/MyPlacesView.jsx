@@ -18,6 +18,7 @@ export default function MyPlacesView({
   onToggleSortByTitle,
   onToggleSortByPlannedDate,
   onToggleSortByCreatedAt,
+  onResetFiltersAndSort,
   recentlyAddedPlaceId,
 }) {
   const hasAnyPlaces = places.length > 0;
@@ -59,28 +60,28 @@ export default function MyPlacesView({
   }
 
   const titleLabel =
-    sortState.by === "title"
+    sortState.key === "title"
       ? sortState.direction === "asc"
         ? "A–Z"
         : "Z–A"
       : "A–Z";
 
   const statusLabel =
-    sortState.by === "status"
+    sortState.key === "status"
       ? sortState.direction === "asc"
         ? "Want → Visited"
         : "Visited → Want"
       : "Status";
 
   const plannedDateLabel =
-    sortState.by === "plannedDate"
+    sortState.key === "plannedDate"
       ? sortState.direction === "asc"
         ? "Earliest planned"
         : "Latest planned"
       : "Planned date";
 
   const createdAtLabel =
-    sortState.by === "createdAt"
+    sortState.key === "createdAt"
       ? sortState.direction === "desc"
         ? "Recently added"
         : "Oldest first"
@@ -104,7 +105,7 @@ export default function MyPlacesView({
 
           <button
             type="button"
-            className={`sort-btn ${sortState.by === "createdAt" ? "active" : ""}`}
+            className={`sort-btn ${sortState.key === "createdAt" ? "active" : ""}`}
             onClick={onToggleSortByCreatedAt}
             disabled={isLoading}
           >
@@ -113,7 +114,7 @@ export default function MyPlacesView({
 
           <button
             type="button"
-            className={`sort-btn ${sortState.by === "title" ? "active" : ""}`}
+            className={`sort-btn ${sortState.key === "title" ? "active" : ""}`}
             onClick={onToggleSortByTitle}
             disabled={isLoading}
           >
@@ -123,7 +124,7 @@ export default function MyPlacesView({
           <button
             type="button"
             className={`sort-btn ${
-              sortState.by === "plannedDate" ? "active" : ""
+              sortState.key === "plannedDate" ? "active" : ""
             }`}
             onClick={onToggleSortByPlannedDate}
             disabled={isLoading}
@@ -133,11 +134,20 @@ export default function MyPlacesView({
 
           <button
             type="button"
-            className={`sort-btn ${sortState.by === "status" ? "active" : ""}`}
+            className={`sort-btn ${sortState.key === "status" ? "active" : ""}`}
             onClick={onToggleSortByStatus}
             disabled={isLoading}
           >
             {statusLabel}
+          </button>
+
+          <button
+            type="button"
+            className="sort-btn secondary"
+            onClick={onResetFiltersAndSort}
+            disabled={isLoading}
+          >
+            Reset
           </button>
 
           <button
