@@ -149,7 +149,7 @@ function App() {
   const [showEmailError, setShowEmailError] = useState(false);
 
   const [filterState, setFilterState] = useState({
-    status: "all",
+    status: [],
     favoritesOnly: false,
     plannedDate: { mode: "any", value: null },
     search: "",
@@ -186,8 +186,8 @@ function App() {
   const filteredUserPlaces = useMemo(() => {
     let result = [...userPlaces];
 
-    if (filterState.status !== "all") {
-      result = result.filter((p) => p.status === filterState.status);
+    if (filterState.status.length > 0) {
+      result = result.filter((p) => filterState.status.includes(p.status));
     }
 
     if (filterState.favoritesOnly) {
