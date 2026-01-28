@@ -72,10 +72,7 @@ function placesReducer(state, action) {
       };
 
     case "SET_DELETE_MODAL":
-      return {
-        ...state,
-        isDeleteModalOpen: action.open,
-      };
+      return { ...state, isDeleteModalOpen: action.open };
 
     case "ADD_PLACE_OPTIMISTIC":
       if (state.userPlaces.some((p) => p.id === action.place.id)) return state;
@@ -150,6 +147,81 @@ function placesReducer(state, action) {
   }
 }
 
+function applyFilters(places, filterState) {
+  return places.filter((p) => {
+    if (filterState.status.length > 0 && !filterState.status.includes(p.status))
+      return false;
+
+    if (filterState.favoritesOnly && !p.isFavorite) return false;
+
+    const pd = p.meta?.plannedDate;
+
+    if (filterState.plannedDate.mode === "with-date" && !pd) return false;
+    if (filterState.plannedDate.mode === "without-date" && pd) return false;
+
+    if (
+      filterState.plannedDate.mode === "before" &&
+      (!pd || pd >= filterState.plannedDate.value)
+    )
+      return false;
+
+    if (
+      filterState.plannedDate.mode === "after" &&
+      (!pd || pd <= filterState.plannedDate.value)
+    )
+      return false;
+
+    if (filterState.search) {
+      const q = filterState.search.toLowerCase();
+      if (
+        !p.title.toLowerCase().includes(q) &&
+        !p.meta?.notes?.toLowerCase().includes(q)
+      )
+        return false;
+    }
+
+    return true;
+  });
+}
+
+function applySorting(places, sortState) {
+  return [...places].sort((a, b) => {
+    if (a.isFavorite !== b.isFavorite) {
+      return a.isFavorite ? -1 : 1;
+    }
+
+    switch (sortState.key) {
+      case "title": {
+        const cmp = a.title.localeCompare(b.title);
+        return sortState.direction === "asc" ? cmp : -cmp;
+      }
+      case "status": {
+        const order =
+          sortState.direction === "asc"
+            ? ["want", "visited"]
+            : ["visited", "want"];
+        return order.indexOf(a.status) - order.indexOf(b.status);
+      }
+      case "plannedDate": {
+        const aDate = a.meta?.plannedDate
+          ? new Date(a.meta.plannedDate).getTime()
+          : Infinity;
+        const bDate = b.meta?.plannedDate
+          ? new Date(b.meta.plannedDate).getTime()
+          : Infinity;
+        return sortState.direction === "asc" ? aDate - bDate : bDate - aDate;
+      }
+      case "createdAt": {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return sortState.direction === "asc" ? aTime - bTime : bTime - aTime;
+      }
+      default:
+        return 0;
+    }
+  });
+}
+
 function App() {
   const placePendingDeletion = useRef(null);
   const selectedNotesPlace = useRef(null);
@@ -187,92 +259,8 @@ function App() {
   }, [editModeEnabled]);
 
   const filteredUserPlaces = useMemo(() => {
-    let result = [...userPlaces];
-
-    if (filterState.status.length > 0) {
-      result = result.filter((p) => filterState.status.includes(p.status));
-    }
-
-    if (filterState.favoritesOnly) {
-      result = result.filter((p) => p.isFavorite);
-    }
-
-    if (filterState.plannedDate.mode === "with-date") {
-      result = result.filter((p) => p.meta?.plannedDate);
-    }
-
-    if (filterState.plannedDate.mode === "without-date") {
-      result = result.filter((p) => !p.meta?.plannedDate);
-    }
-
-    if (
-      filterState.plannedDate.mode === "before" &&
-      filterState.plannedDate.value
-    ) {
-      result = result.filter(
-        (p) =>
-          p.meta?.plannedDate &&
-          p.meta.plannedDate < filterState.plannedDate.value,
-      );
-    }
-
-    if (
-      filterState.plannedDate.mode === "after" &&
-      filterState.plannedDate.value
-    ) {
-      result = result.filter(
-        (p) =>
-          p.meta?.plannedDate &&
-          p.meta.plannedDate > filterState.plannedDate.value,
-      );
-    }
-
-    if (filterState.search) {
-      const q = filterState.search.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.meta?.notes?.toLowerCase().includes(q),
-      );
-    }
-
-    result.sort((a, b) => {
-      if (a.isFavorite !== b.isFavorite) {
-        return a.isFavorite ? -1 : 1;
-      }
-
-      switch (sortState.key) {
-        case "title": {
-          const cmp = a.title.localeCompare(b.title);
-          return sortState.direction === "asc" ? cmp : -cmp;
-        }
-        case "status": {
-          const order =
-            sortState.direction === "asc"
-              ? ["want", "visited"]
-              : ["visited", "want"];
-          return order.indexOf(a.status) - order.indexOf(b.status);
-        }
-        case "plannedDate": {
-          const aDate = a.meta?.plannedDate
-            ? new Date(a.meta.plannedDate).getTime()
-            : Infinity;
-          const bDate = b.meta?.plannedDate
-            ? new Date(b.meta.plannedDate).getTime()
-            : Infinity;
-          return sortState.direction === "asc" ? aDate - bDate : bDate - aDate;
-        }
-        case "createdAt": {
-          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return sortState.direction === "asc" ? aTime - bTime : bTime - aTime;
-        }
-        default:
-          return 0;
-      }
-    });
-
-    return result;
+    const filtered = applyFilters(userPlaces, filterState);
+    return applySorting(filtered, sortState);
   }, [userPlaces, filterState, sortState]);
 
   function toggleSort(key, defaultDirection = "asc") {
