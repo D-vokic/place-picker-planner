@@ -59,33 +59,23 @@ export default function MyPlacesView({
     }
   }
 
-  const titleLabel =
-    sortState.key === "title"
-      ? sortState.direction === "asc"
-        ? "A–Z"
-        : "Z–A"
-      : "A–Z";
+  function handleSortChange(e) {
+    const key = e.target.value;
 
-  const statusLabel =
-    sortState.key === "status"
-      ? sortState.direction === "asc"
-        ? "Want → Visited"
-        : "Visited → Want"
-      : "Status";
+    if (key === "title") onToggleSortByTitle();
+    if (key === "status") onToggleSortByStatus();
+    if (key === "plannedDate") onToggleSortByPlannedDate();
+    if (key === "createdAt") onToggleSortByCreatedAt();
+  }
 
-  const plannedDateLabel =
-    sortState.key === "plannedDate"
-      ? sortState.direction === "asc"
-        ? "Earliest planned"
-        : "Latest planned"
-      : "Planned date";
+  function handleSortClick() {
+    const key = sortState.key;
 
-  const createdAtLabel =
-    sortState.key === "createdAt"
-      ? sortState.direction === "desc"
-        ? "Recently added"
-        : "Oldest first"
-      : "Added";
+    if (key === "title") onToggleSortByTitle();
+    if (key === "status") onToggleSortByStatus();
+    if (key === "plannedDate") onToggleSortByPlannedDate();
+    if (key === "createdAt") onToggleSortByCreatedAt();
+  }
 
   return (
     <section className="places-category" aria-busy={isLoading}>
@@ -103,43 +93,18 @@ export default function MyPlacesView({
             {favoriteOnly ? "⭐ Favorites" : "☆ Favorites"}
           </button>
 
-          <button
-            type="button"
-            className={`sort-btn ${sortState.key === "createdAt" ? "active" : ""}`}
-            onClick={onToggleSortByCreatedAt}
+          <select
+            className="sort-dropdown"
+            value={sortState.key}
+            onChange={handleSortChange}
+            onClick={handleSortClick}
             disabled={isLoading}
           >
-            {createdAtLabel}
-          </button>
-
-          <button
-            type="button"
-            className={`sort-btn ${sortState.key === "title" ? "active" : ""}`}
-            onClick={onToggleSortByTitle}
-            disabled={isLoading}
-          >
-            {titleLabel}
-          </button>
-
-          <button
-            type="button"
-            className={`sort-btn ${
-              sortState.key === "plannedDate" ? "active" : ""
-            }`}
-            onClick={onToggleSortByPlannedDate}
-            disabled={isLoading}
-          >
-            {plannedDateLabel}
-          </button>
-
-          <button
-            type="button"
-            className={`sort-btn ${sortState.key === "status" ? "active" : ""}`}
-            onClick={onToggleSortByStatus}
-            disabled={isLoading}
-          >
-            {statusLabel}
-          </button>
+            <option value="createdAt">Recently added</option>
+            <option value="title">Title</option>
+            <option value="plannedDate">Planned date</option>
+            <option value="status">Status</option>
+          </select>
 
           <button
             type="button"

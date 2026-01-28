@@ -1,4 +1,3 @@
-// Delete comments
 import {
   useRef,
   useEffect,
@@ -266,11 +265,14 @@ function App() {
 
   function toggleSort(key, defaultDirection = "asc") {
     setSortState((s) =>
-      s.key !== key
-        ? { key, direction: defaultDirection }
-        : {
+      s.key === key
+        ? {
             key,
             direction: s.direction === "asc" ? "desc" : "asc",
+          }
+        : {
+            key,
+            direction: defaultDirection,
           },
     );
   }
