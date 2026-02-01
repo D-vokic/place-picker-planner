@@ -1,9 +1,10 @@
 # Place Picker Planner
 
 Place Picker Planner is a full-stack React application for selecting, saving, and organizing places that matter to you.
-The project is designed as a real-world, production-oriented application and is developed incrementally through clearly defined commits and versioned phases.
 
-## Current Version: v1.1 – Stabilization Phase
+The project is built as a **production-oriented, incrementally developed application** with a strict focus on stability, clarity, and long-term maintainability.
+
+## Current Version: v2.0 – Feature Expansion on Stable Baseline
 
 ## Demo
 
@@ -25,28 +26,106 @@ v1.0 established a complete, functional application with:
 - Clear separation of concerns
 - Production-oriented architecture
 
-No new features are added on top of v1.0 without versioning.
+No new features were added without versioning.
 
-### v1.1 – Stabilization Phase (Current)
+### v1.1 – Stabilization Phase (Completed)
 
-v1.1 focuses on **internal safety, predictability, and UX polish**.
+v1.1 focused on **internal safety, predictability, and UX polish**, without changing user-facing behavior.
 
-Scope of v1.1:
-
-- No new product features
-- No API changes
-- No architectural rewrites
-
-Improvements include:
+Key Improvements:
 
 - Safer optimistic update rollback
-- Improved backend sync reliability
+- Backend sync reliability
 - Clearer empty and loading states
 - Accessibility improvements (ARIA roles, keyboard semantics)
 - Better modal and dialog behavior
 - Improved internal clarity and documentation
 
-From a user perspective, the application behaves the same as v1.0, but is more robust and polished.
+---
+
+### v2.0 – Feature Expansion (Current)
+
+v2.0 builds **on top of the stable v1.x baseline**.
+
+Core guarantees:
+
+- Backend API is stable and reliable
+- Persistence layer is complete
+- No regressions in core flow
+
+v2.0 introduces **controlled feature expansion**, UI enhancements, and improved data handling.
+
+---
+
+## Current Feature Set (v2.0)
+
+### Core Flow
+
+- Available Places → My Places → Backend persistence
+- Optimistic UI updates
+- Duplicate-safe backend behavior
+- No API contract assumptions (plain arrays only)
+
+### My Places Features
+
+- Favorites toggle (synced with backend)
+- Status toggle (want to visit / visited)
+- Notes editor (modal)
+- Planned visit date
+- Delete with confirmation dialog
+- Email-based edit mode
+
+### Search, Filtering & Sorting
+
+- Text search
+- Category filtering
+- Title sorting (A–Z / Z–A)
+- Multiple filters combined
+- Single transformation pipeline (filter → sort)
+- No mutation of original state
+- Reset filters / sorting
+
+### UX & Reliability
+
+- Stable empty and “no results” states
+- Optimistic UI with safe rollback
+- Predictable modal behavior
+- Accessible controls and toggles
+- Responsive layout
+
+---
+
+## Backend Status (Stable)
+
+Backend runs via:
+
+````bash
+node app.js
+
+---
+
+## Endpoints
+
+- GET /places
+- GET /user-places
+- POST /user-places
+- DELETE /user-places/:id
+- PATCH /user-places/:id
+- PATCH /user-places/:id/favorite
+- PATCH /user-places/:id/status
+
+## Storage
+
+- places.json – plain array
+- user-places.json – plain array
+- SQLite database introduced for persistence layer upgrade
+
+## Guarantees
+
+- No wrapped data structures
+- No backend crashes
+- Duplicate adds handled as no-op 200 OK
+- Static image serving via /images
 
 ---
 
@@ -60,7 +139,7 @@ From the project root directory, install the required dependencies:
 
 ```bash
 npm install
-```
+````
 
 ### 2. Start the frontend development server
 
@@ -126,124 +205,91 @@ The following files are defined in the project root:
 - Preserves backend state
 - No development-only logic
 
-## Implemented Features (v1.0)
-
-At this stage, the project includes:
-
-- Available Places and My Places views
-- Adding places with optimistic UI updates
-- Removing places with confirmation modal
-- Favorites (star toggle)
-- Place status tracking (want to visit / visited)
-- Notes and planned visit date
-- Category filtering and text search
-- Optional map preview
-- Responsive layout
-- Global error handling
-- Loading states and fallback UI
-- Email-based edit mode
-
-## UX & Accessibility (v1.1)
-
-- Improved empty and loading states
-- Proper dialog and modal semantics
-- Accessible buttons and toggles
-- Keyboard- and screen-reader-friendly interactions
-- Disabled state consistency
-
 ---
 
 ## Tech Stack
 
 ### Frontend
 
-- React
-- Vite
-- JavaScript (ES6+)
-- CSS (modular)
+- **React**
+- **Vite**
+- **JavaScript (ES6+)**
+- **CSS (modular)**
 
 ### Backend
 
-- Node.js
-- Express
-- JSON-based data storage (temporary)
-
----
-
-## Development Principles
-
-- One logical change per commit
-- Strict version boundaries (v1.x vs v2.0)
-- Refactoring without behavioral changes
-- No speculative or demo-only code
-- Production-readiness over tutorials
-
----
-
-## Roadmap
-
-### v1.1 (Current)
-
-- Stabilization
-- UX & accessibility polish
-- Documentation clarity
-
-### v2.0 (Planned)
-
-- Real authentication
-- Per-user data separation
-- Database-backed persistence
-- Feature expansion
-- Testing infrastructure
+- **Node.**
+- **Express**
+- **SQLite (current persistence layer)**
+- **JSON (legacy / transitional)**
 
 ---
 
 ## Project Structure
 
-## Project Structure
-
-```text
-PlacePicker/
+```PlacePicker/
 ├── backend/
-│   ├── data/              # JSON persistence (temporary storage)
-│   ├── images/            # Place images served by backend
-│   ├── app.js             # Express app entry point
+│   ├── data/              # Persistence (SQLite + JSON)
+│   ├── images/            # Place images
+│   ├── app.js             # Backend entry point
 │   └── package.json
 ├── public/
 ├── src/
-│   ├── assets/            # Static frontend assets (logos, icons)
-│   ├── components/        # Reusable UI components (lists, items, modals)
-│   ├── styles/            # Modular CSS (layout, components, modals, etc.)
-│   ├── views/             # Page-level views (MyPlaces, AvailablePlaces)
-│   ├── utils/             # API and helper utilities
-│   ├── App.jsx            # Root application component
-│   ├── main.jsx           # React entry point
-│   └── index.css          # CSS entry point
+│   ├── assets/            # Static assets
+│   ├── components/        # UI components
+│   ├── styles/            # Modular CSS
+│   ├── views/             # Page-level views
+│   ├── utils/             # API and helpers
+│   ├── App.jsx            # Root component
+│   ├── main.jsx           # Entry point
+│   └── index.css
 ├── index.html
 ├── vite.config.js
 └── package.json
 ```
 
-This structure enforces:
+---
 
-- Clear separation between frontend and backend
-- Isolation of business logic, UI components, and views
-- Scalable organization for future v2.0 expansion
+### Development Principles
+
+- One logical change per commit
+- Strict version boundaries
+- Stable baseline first, features second
+- No speculative or demo-only code
+- Production-readiness over tutorials
 
 ---
 
-### Development Approach
+### Roadmap
 
-- Each meaningful change is represented by a single, clear commit
-- Features are added incrementally based on a predefined roadmap
-- Refactoring is treated as a first-class task
-- UI, state logic, and business logic are kept clearly separated
+### v2.0 (Current)
+
+- Advanced filtering UX
+- Visual indicators for active filters
+- Optional persistence of UI preferences
+- Activity history tracking
+- UX refinement
+
+### v3.0 (Planned)
+
+- Authentication
+- True per-user data separation
+- Expanded testing infrastructure
+- Deployment hardening
+
+---
+
+## Contributing / Support
+
+- Contributions are welcome. Feel free to open an issue or submit a pull request.
+- For problems or suggestions, please use GitHub issues.
 
 ---
 
 ### Status
 
-This project is under active development.
+Stable baseline maintained.
+Feature work is ongoing and safe.
 
 ---
 
@@ -256,7 +302,7 @@ This project is under active development.
 
 ## Author
 
-This project is maintained by Dusko Vokic.
+This project is maintained by \*\*Dusko Vokic\*\*
 You can reach out via:
 
 - GitHub: https://github.com/D-vokic
@@ -266,6 +312,4 @@ You can reach out via:
 
 ## License
 
-This project is licensed under the MIT License.
-
----
+## This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
