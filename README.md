@@ -139,7 +139,7 @@ From the project root directory, install the required dependencies:
 
 ```bash
 npm install
-````
+```
 
 ### 2. Start the frontend development server
 
