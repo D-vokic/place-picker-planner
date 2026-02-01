@@ -1,0 +1,14 @@
+[
+  {
+    "id": "p3",
+    "title": "Himalayan Peaks",
+    "imageUrl": "http://localhost:3000/images/majestic-mountains.jpg",
+    "imageAlt": "The sun setting behind snow-capped peaks of majestic mountains.",
+    "city": "",
+    "category": "mountain",
+    "lat": 27.9881,
+    "lon": 86.925,
+    "status": "want",
+    "isFavorite": true
+  }
+]

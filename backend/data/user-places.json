@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "p2",
+    "title": "Sahara Desert Dunes",
+    "imageUrl": "http://localhost:3000/images/desert-dunes.jpg",
+    "imageAlt": "Golden dunes stretching to the horizon in the Sahara Desert.",
+    "city": "",
+    "category": "desert",
+    "lat": 25,
+    "lon": 0,
+    "status": "want",
+    "isFavorite": true,
+    "meta": {
+      "notes": "gggggg",
+      "plannedDate": "2026-01-13"
+    }
+  }
+]

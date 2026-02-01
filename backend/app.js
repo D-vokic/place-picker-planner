@@ -19,8 +19,6 @@ const db = await open({
   driver: sqlite3.Database,
 });
 
-/* ===== SCHEMA ===== */
-
 await db.exec(`
   CREATE TABLE IF NOT EXISTS places (
     id TEXT PRIMARY KEY,
@@ -36,8 +34,6 @@ await db.exec(`
   );
 `);
 
-/* ===== AUTH ===== */
-
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -52,8 +48,6 @@ function authMiddleware(req, res, next) {
 }
 
 app.use(authMiddleware);
-
-/* ===== STABLE V1 ENDPOINTS ===== */
 
 app.get("/places", async (req, res) => {
   const rows = await db.all("SELECT data FROM places");

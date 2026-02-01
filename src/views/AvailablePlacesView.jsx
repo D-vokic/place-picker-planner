@@ -64,9 +64,10 @@ export default function AvailablePlacesView({ onSelectPlace }) {
     return <ErrorPage title="Failed to load places" message={error} />;
   }
 
-  const categories = useMemo(() => {
-    return Array.from(new Set(availablePlaces.map((place) => place.category)));
-  }, [availablePlaces]);
+  const categories = useMemo(
+    () => Array.from(new Set(availablePlaces.map((p) => p.category))),
+    [availablePlaces],
+  );
 
   const processedPlaces = useMemo(() => {
     let result = [...availablePlaces];
@@ -98,15 +99,17 @@ export default function AvailablePlacesView({ onSelectPlace }) {
 
   return (
     <>
-      <SearchInput value={searchTerm} onChange={setSearchTerm} />
+      <div className="controls-grid">
+        <SearchInput value={searchTerm} onChange={setSearchTerm} />
 
-      <CategoryFilter
-        categories={categories}
-        selected={selectedCategory}
-        onChange={setSelectedCategory}
-      />
+        <CategoryFilter
+          categories={categories}
+          selected={selectedCategory}
+          onChange={setSelectedCategory}
+        />
+      </div>
 
-      <section className="places-category">
+      <section className="places-category available-places">
         <h2>Available Places</h2>
 
         {isFetching && (

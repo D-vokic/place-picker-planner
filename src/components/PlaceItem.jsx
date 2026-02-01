@@ -8,12 +8,9 @@ export default function PlaceItem({
   disabled,
   highlight,
 }) {
-  const hasCoordinates =
-    typeof place.lat === "number" && typeof place.lon === "number";
-
-  const isFavorite = Boolean(place.isFavorite);
+  const isFavorite = place.isFavorite === true;
   const plannedDate = place.meta?.plannedDate;
-  const hasNotes = place.meta?.notes;
+  const hasNotes = Boolean(place.meta?.notes);
 
   return (
     <li className={`place-item ${highlight ? "highlight" : ""}`}>
@@ -27,33 +24,53 @@ export default function PlaceItem({
               : undefined
           }
           disabled={disabled}
-          aria-label={`Select ${place.title}`}
         >
           <img src={place.imageUrl} alt={place.imageAlt} />
         </button>
 
-        {onToggleFavorite && (
-          <button
-            type="button"
-            className={`favorite-toggle ${isFavorite ? "active" : ""}`}
-            onClick={() => onToggleFavorite(place.id)}
-            disabled={disabled}
-            aria-pressed={isFavorite}
-            aria-label={
-              isFavorite
-                ? `Remove ${place.title} from favorites`
-                : `Add ${place.title} to favorites`
-            }
-          >
-            {isFavorite ? "★" : "☆"}
-          </button>
-        )}
+        <button
+          type="button"
+          className={`favorite-toggle ${isFavorite ? "active" : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite(place.id);
+          }}
+          disabled={disabled}
+        >
+          {isFavorite ? "★" : "☆"}
+        </button>
       </div>
 
-      {showMapPreview && place.isNearest && hasCoordinates && (
+      <h3 className="place-title">{place.title}</h3>
+
+      {place.city && <p className="place-city">{place.city}</p>}
+
+      <div className="place-actions">
+        <button
+          type="button"
+          className="status-toggle"
+          onClick={() => onToggleStatus(place.id)}
+          disabled={disabled}
+        >
+          {place.status === "visited" ? "Visited" : "Want to visit"}
+        </button>
+
+        <button
+          type="button"
+          className="notes-btn"
+          onClick={() => onOpenNotes(place)}
+          disabled={disabled}
+        >
+          Notes{hasNotes ? "*" : ""}
+        </button>
+      </div>
+
+      {plannedDate && <p className="planned-date">Planned: {plannedDate}</p>}
+
+      {showMapPreview && place.isNearest && place.lat && place.lon && (
         <div className="map-preview">
           <iframe
-            title={`Map preview of ${place.title}`}
+            title={`Map of ${place.title}`}
             width="100%"
             height="150"
             loading="lazy"
@@ -64,40 +81,6 @@ export default function PlaceItem({
             }&layer=mapnik&marker=${place.lat}%2C${place.lon}`}
           />
         </div>
-      )}
-
-      <h3 className="place-title">{place.title}</h3>
-
-      {onToggleStatus && (
-        <button
-          type="button"
-          className="status-toggle"
-          onClick={() => onToggleStatus(place.id)}
-          disabled={disabled}
-          aria-label={`Mark ${place.title} as ${
-            place.status === "visited" ? "want to visit" : "visited"
-          }`}
-        >
-          {place.status === "visited" ? "Visited" : "Want to visit"}
-        </button>
-      )}
-
-      {plannedDate && (
-        <p className="planned-date" role="status">
-          Planned: {plannedDate}
-        </p>
-      )}
-
-      {onOpenNotes && (
-        <button
-          type="button"
-          className="notes-btn"
-          onClick={() => onOpenNotes(place)}
-          disabled={disabled}
-          aria-label={`Open notes for ${place.title}`}
-        >
-          Notes{hasNotes ? "*" : ""}
-        </button>
       )}
     </li>
   );

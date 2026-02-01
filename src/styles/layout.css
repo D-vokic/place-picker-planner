@@ -1,47 +1,33 @@
 header {
   text-align: center;
-  padding: 1rem 0;
+  padding: 2rem 0;
 }
-header img {
-  width: 4rem;
-  height: 4rem;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.4));
-}
+
 header h1 {
   margin: 0.5rem 0 0;
   font-size: 2rem;
-  text-transform: uppercase;
   letter-spacing: 0.4rem;
 }
+
 header p {
   margin: 0.5rem auto 0;
-  font-size: 1rem;
-  max-width: 34ch;
+  max-width: 40ch;
   color: #9eb5b4;
 }
 
-.places-category {
-  margin: 1.5rem auto;
-  padding: 1rem;
-  border: 2px solid #0d373e;
-  border-radius: 8px;
-}
-.places-category h2 {
-  font-family: "Raleway", sans-serif;
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-  color: #8feeff;
-  text-align: center;
-}
-.fallback-text {
-  text-align: center;
-}
-.places {
+.controls-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: center;
   margin: 1.5rem auto;
-  padding: 0;
-  list-style: none;
+  max-width: 1000px;
+}
+
+.places-category {
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 2px solid #0d373e;
+  border-radius: 10px;
+  max-width: 1200px;
 }
