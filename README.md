@@ -101,6 +101,7 @@ Backend runs via:
 
 ```bash
 node app.js
+```
 
 
 ---
@@ -140,7 +141,7 @@ From the project root directory, install the required dependencies:
 
 ```bash
 npm install
-
+```
 
 
 ### 2. Start the frontend development server
@@ -149,7 +150,7 @@ After the installation is complete, start the Vite development server:
 
 ```bash
 npm run dev
-
+```
 
 ### 3. Install backend dependencies
 
@@ -158,7 +159,7 @@ Open a new terminal window, navigate to the backend folder, and install backend 
 ```bash
 cd backend
 npm install
-
+```
 
 ### 4. Start the backend server
 
@@ -166,7 +167,7 @@ From the backend folder, start the Node.js server:
 
 ```bash
 node app.js
-
+```
 
 The frontend and backend servers must be running simultaneously for the application to work correctly.
 
