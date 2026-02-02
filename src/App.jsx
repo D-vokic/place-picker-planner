@@ -4,10 +4,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MyPlacesView from "./views/MyPlacesView.jsx";
 import AvailablePlacesView from "./views/AvailablePlacesView.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
+import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
 
 import logoImg from "./assets/logoImg.svg";
 
-import { fetchUserPlaces, togglePlaceFavorite } from "./utils/api.js";
+import {
+  fetchUserPlaces,
+  togglePlaceFavorite,
+  removeUserPlace,
+} from "./utils/api.js";
 
 const INITIAL_FILTER_STATE = {
   status: [],
@@ -46,6 +51,12 @@ function placesReducer(state, action) {
         ),
       };
 
+    case "REMOVE_PLACE":
+      return {
+        ...state,
+        userPlaces: state.userPlaces.filter((p) => p.id !== action.placeId),
+      };
+
     case "RESET_USER_STATE":
       return {
         ...state,
@@ -67,6 +78,8 @@ export default function App() {
 
   const [filterState, setFilterState] = useState(INITIAL_FILTER_STATE);
   const [sortState, setSortState] = useState(INITIAL_SORT_STATE);
+
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const isEmailValid = emailPattern.test(email);
@@ -97,6 +110,22 @@ export default function App() {
   function handleToggleFavorite(placeId) {
     dispatch({ type: "TOGGLE_FAVORITE", placeId });
     togglePlaceFavorite(placeId);
+  }
+
+  function handleSelectPlace(place) {
+    setSelectedPlace(place);
+  }
+
+  function handleCancelRemove() {
+    setSelectedPlace(null);
+  }
+
+  function handleConfirmRemove() {
+    if (!selectedPlace) return;
+
+    dispatch({ type: "REMOVE_PLACE", placeId: selectedPlace.id });
+    removeUserPlace(selectedPlace.id);
+    setSelectedPlace(null);
   }
 
   const filteredPlaces = useMemo(() => {
@@ -163,6 +192,7 @@ export default function App() {
                   setFilterState={setFilterState}
                   sortState={sortState}
                   onToggleFavorite={handleToggleFavorite}
+                  onSelectPlace={handleSelectPlace}
                   onResetFiltersAndSort={() => {
                     setFilterState(INITIAL_FILTER_STATE);
                     setSortState(INITIAL_SORT_STATE);
@@ -186,6 +216,13 @@ export default function App() {
         />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
+
+      {selectedPlace && (
+        <DeleteConfirmation
+          onCancel={handleCancelRemove}
+          onConfirm={handleConfirmRemove}
+        />
+      )}
     </BrowserRouter>
   );
 }

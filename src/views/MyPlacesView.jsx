@@ -10,6 +10,7 @@ export default function MyPlacesView({
   onToggleSort,
   onResetFiltersAndSort,
   onToggleFavorite,
+  onSelectPlace,
   recentlyAddedPlaceId,
 }) {
   function toggleStatusFilter(status) {
@@ -81,6 +82,7 @@ export default function MyPlacesView({
 
       <PlacesList
         places={places}
+        onSelectPlace={onSelectPlace}
         onToggleFavorite={onToggleFavorite}
         disabled={isLoading}
         highlightedPlaceId={recentlyAddedPlaceId}

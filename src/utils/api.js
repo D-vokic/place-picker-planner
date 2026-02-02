@@ -24,8 +24,6 @@ async function request(endpoint, options = {}) {
   return response.json();
 }
 
-/* ===== STABLE V1 API ===== */
-
 export function fetchPlaces() {
   return request("/places");
 }
@@ -65,8 +63,6 @@ export function updatePlaceMeta(placeId, meta) {
     body: JSON.stringify({ meta }),
   });
 }
-
-/* ===== EXPORT (RESTORED) ===== */
 
 export function exportCollection() {
   return request("/user-places");
