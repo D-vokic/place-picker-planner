@@ -60,10 +60,6 @@ export default function AvailablePlacesView({ onSelectPlace }) {
     loadPlaces();
   }, []);
 
-  if (error) {
-    return <ErrorPage title="Failed to load places" message={error} />;
-  }
-
   const categories = useMemo(
     () => Array.from(new Set(availablePlaces.map((p) => p.category))),
     [availablePlaces],
@@ -99,39 +95,44 @@ export default function AvailablePlacesView({ onSelectPlace }) {
 
   return (
     <>
-      <div className="controls-grid">
-        <SearchInput value={searchTerm} onChange={setSearchTerm} />
+      {error && <ErrorPage title="Failed to load places" message={error} />}
 
-        <CategoryFilter
-          categories={categories}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-        />
-      </div>
+      {!error && (
+        <>
+          <div className="controls-grid">
+            <SearchInput value={searchTerm} onChange={setSearchTerm} />
+            <CategoryFilter
+              categories={categories}
+              selected={selectedCategory}
+              onChange={setSelectedCategory}
+            />
+          </div>
 
-      <section className="places-category available-places">
-        <h2>Available Places</h2>
+          <section className="places-category available-places">
+            <h2>Available Places</h2>
 
-        {isFetching && (
-          <p className="fallback-text" aria-busy="true">
-            Fetching places...
-          </p>
-        )}
+            {isFetching && (
+              <p className="fallback-text" aria-busy="true">
+                Fetching places...
+              </p>
+            )}
 
-        {!isFetching && processedPlaces.length === 0 && (
-          <p className="fallback-text">No places match your search.</p>
-        )}
+            {!isFetching && processedPlaces.length === 0 && (
+              <p className="fallback-text">No places match your search.</p>
+            )}
 
-        {!isFetching && processedPlaces.length > 0 && (
-          <PlacesList
-            places={processedPlaces}
-            onSelectPlace={onSelectPlace}
-            disabled={isFetching}
-            showMapPreview={true}
-            recentlyAddedPlaceId={null}
-          />
-        )}
-      </section>
+            {!isFetching && processedPlaces.length > 0 && (
+              <PlacesList
+                places={processedPlaces}
+                onSelectPlace={onSelectPlace}
+                disabled={isFetching}
+                showMapPreview={true}
+                recentlyAddedPlaceId={null}
+              />
+            )}
+          </section>
+        </>
+      )}
     </>
   );
 }

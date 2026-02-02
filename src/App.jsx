@@ -12,6 +12,7 @@ import {
   fetchUserPlaces,
   togglePlaceFavorite,
   removeUserPlace,
+  addUserPlace,
 } from "./utils/api.js";
 
 const INITIAL_FILTER_STATE = {
@@ -41,6 +42,12 @@ function placesReducer(state, action) {
           isFavorite: p.isFavorite === true,
         })),
         isLoadingUserPlaces: false,
+      };
+
+    case "ADD_PLACE":
+      return {
+        ...state,
+        userPlaces: [...state.userPlaces, action.place],
       };
 
     case "TOGGLE_FAVORITE":
@@ -110,6 +117,11 @@ export default function App() {
   function handleToggleFavorite(placeId) {
     dispatch({ type: "TOGGLE_FAVORITE", placeId });
     togglePlaceFavorite(placeId);
+  }
+
+  function handleSelectAvailablePlace(place) {
+    dispatch({ type: "ADD_PLACE", place });
+    addUserPlace(place);
   }
 
   function handleSelectPlace(place) {
@@ -210,7 +222,7 @@ export default function App() {
                 />
               )}
 
-              <AvailablePlacesView />
+              <AvailablePlacesView onSelectPlace={handleSelectAvailablePlace} />
             </main>
           }
         />
