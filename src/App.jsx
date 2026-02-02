@@ -11,6 +11,7 @@ import logoImg from "./assets/logoImg.svg";
 import {
   fetchUserPlaces,
   togglePlaceFavorite,
+  togglePlaceStatus,
   removeUserPlace,
   addUserPlace,
 } from "./utils/api.js";
@@ -55,6 +56,16 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: state.userPlaces.map((p) =>
           p.id === action.placeId ? { ...p, isFavorite: !p.isFavorite } : p,
+        ),
+      };
+
+    case "TOGGLE_STATUS":
+      return {
+        ...state,
+        userPlaces: state.userPlaces.map((p) =>
+          p.id === action.placeId
+            ? { ...p, status: p.status === "visited" ? "want" : "visited" }
+            : p,
         ),
       };
 
@@ -117,6 +128,11 @@ export default function App() {
   function handleToggleFavorite(placeId) {
     dispatch({ type: "TOGGLE_FAVORITE", placeId });
     togglePlaceFavorite(placeId);
+  }
+
+  function handleToggleStatus(placeId) {
+    dispatch({ type: "TOGGLE_STATUS", placeId });
+    togglePlaceStatus(placeId);
   }
 
   function handleSelectAvailablePlace(place) {
@@ -204,6 +220,7 @@ export default function App() {
                   setFilterState={setFilterState}
                   sortState={sortState}
                   onToggleFavorite={handleToggleFavorite}
+                  onToggleStatus={handleToggleStatus}
                   onSelectPlace={handleSelectPlace}
                   onResetFiltersAndSort={() => {
                     setFilterState(INITIAL_FILTER_STATE);
