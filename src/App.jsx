@@ -5,6 +5,7 @@ import MyPlacesView from "./views/MyPlacesView.jsx";
 import AvailablePlacesView from "./views/AvailablePlacesView.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
+import ModalEditorNotes from "./components/ModalEditorNotes.jsx";
 
 import logoImg from "./assets/logoImg.svg";
 
@@ -14,6 +15,7 @@ import {
   togglePlaceStatus,
   removeUserPlace,
   addUserPlace,
+  updatePlaceMeta,
 } from "./utils/api.js";
 
 const INITIAL_FILTER_STATE = {
@@ -69,6 +71,16 @@ function placesReducer(state, action) {
         ),
       };
 
+    case "UPDATE_META":
+      return {
+        ...state,
+        userPlaces: state.userPlaces.map((p) =>
+          p.id === action.placeId
+            ? { ...p, meta: { ...p.meta, ...action.meta } }
+            : p,
+        ),
+      };
+
     case "REMOVE_PLACE":
       return {
         ...state,
@@ -98,6 +110,7 @@ export default function App() {
   const [sortState, setSortState] = useState(INITIAL_SORT_STATE);
 
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [notesPlace, setNotesPlace] = useState(null);
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const isEmailValid = emailPattern.test(email);
@@ -142,6 +155,20 @@ export default function App() {
 
   function handleSelectPlace(place) {
     setSelectedPlace(place);
+  }
+
+  function handleOpenNotes(place) {
+    setNotesPlace(place);
+  }
+
+  function handleSaveNotes(placeId, meta) {
+    dispatch({ type: "UPDATE_META", placeId, meta });
+    updatePlaceMeta(placeId, meta);
+    setNotesPlace(null);
+  }
+
+  function handleCancelNotes() {
+    setNotesPlace(null);
   }
 
   function handleCancelRemove() {
@@ -221,6 +248,7 @@ export default function App() {
                   sortState={sortState}
                   onToggleFavorite={handleToggleFavorite}
                   onToggleStatus={handleToggleStatus}
+                  onOpenNotes={handleOpenNotes}
                   onSelectPlace={handleSelectPlace}
                   onResetFiltersAndSort={() => {
                     setFilterState(INITIAL_FILTER_STATE);
@@ -250,6 +278,16 @@ export default function App() {
         <DeleteConfirmation
           onCancel={handleCancelRemove}
           onConfirm={handleConfirmRemove}
+        />
+      )}
+
+      {notesPlace && (
+        <ModalEditorNotes
+          open={true}
+          notes={notesPlace.meta?.notes}
+          plannedDate={notesPlace.meta?.plannedDate}
+          onSave={(meta) => handleSaveNotes(notesPlace.id, meta)}
+          onClose={handleCancelNotes}
         />
       )}
     </BrowserRouter>
