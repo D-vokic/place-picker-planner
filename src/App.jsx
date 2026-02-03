@@ -177,7 +177,6 @@ export default function App() {
 
   function handleConfirmRemove() {
     if (!selectedPlace) return;
-
     dispatch({ type: "REMOVE_PLACE", placeId: selectedPlace.id });
     removeUserPlace(selectedPlace.id);
     setSelectedPlace(null);
@@ -200,6 +199,25 @@ export default function App() {
     }
 
     result.sort((a, b) => {
+      if (sortState.key === "plannedDate") {
+        const aHas = Boolean(a.meta?.plannedDate);
+        const bHas = Boolean(b.meta?.plannedDate);
+
+        if (aHas !== bHas) {
+          return sortState.direction === "asc" ? bHas - aHas : aHas - bHas;
+        }
+
+        if (aHas && bHas) {
+          const aDate = a.meta.plannedDate;
+          const bDate = b.meta.plannedDate;
+          return sortState.direction === "asc"
+            ? aDate.localeCompare(bDate)
+            : bDate.localeCompare(aDate);
+        }
+
+        return 0;
+      }
+
       let aVal = a[sortState.key];
       let bVal = b[sortState.key];
 
@@ -254,15 +272,11 @@ export default function App() {
                     setFilterState(INITIAL_FILTER_STATE);
                     setSortState(INITIAL_SORT_STATE);
                   }}
-                  onToggleSort={(key) =>
-                    setSortState((s) =>
-                      s.key === key
-                        ? {
-                            key,
-                            direction: s.direction === "asc" ? "desc" : "asc",
-                          }
-                        : { key, direction: "asc" },
-                    )
+                  onToggleSort={(value) =>
+                    setSortState({
+                      key: value.endsWith("-desc") ? value.slice(0, -5) : value,
+                      direction: value.endsWith("-desc") ? "desc" : "asc",
+                    })
                   }
                 />
               )}
@@ -283,11 +297,9 @@ export default function App() {
 
       {notesPlace && (
         <ModalEditorNotes
-          open={true}
-          notes={notesPlace.meta?.notes}
-          plannedDate={notesPlace.meta?.plannedDate}
-          onSave={(meta) => handleSaveNotes(notesPlace.id, meta)}
-          onClose={handleCancelNotes}
+          place={notesPlace}
+          onCancel={handleCancelNotes}
+          onSave={handleSaveNotes}
         />
       )}
     </BrowserRouter>

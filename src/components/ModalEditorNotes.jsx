@@ -1,30 +1,19 @@
 import { useState, useEffect } from "react";
 
-export default function ModalEditorNotes({
-  open,
-  notes,
-  plannedDate,
-  onSave,
-  onClose,
-}) {
+export default function ModalEditorNotes({ place, onSave, onCancel }) {
   const [notesDraft, setNotesDraft] = useState("");
   const [dateDraft, setDateDraft] = useState("");
 
   useEffect(() => {
-    if (open) {
-      setNotesDraft(notes ?? "");
-      setDateDraft(plannedDate ?? "");
-    }
-  }, [open, notes, plannedDate]);
-
-  if (!open) return null;
+    setNotesDraft(place.meta?.notes ?? "");
+    setDateDraft(place.meta?.plannedDate ?? "");
+  }, [place]);
 
   function handleSave() {
-    onSave({
+    onSave(place.id, {
       notes: notesDraft,
       plannedDate: dateDraft || null,
     });
-    onClose();
   }
 
   return (
@@ -52,7 +41,7 @@ export default function ModalEditorNotes({
         />
 
         <div className="btn-row">
-          <button type="button" className="btn-cancel" onClick={onClose}>
+          <button type="button" className="btn-cancel" onClick={onCancel}>
             Cancel
           </button>
 

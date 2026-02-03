@@ -12,9 +12,9 @@ export default function PlacesList({
 }) {
   return (
     <ul className="places">
-      {places.map((place, index) => (
+      {places.map((place) => (
         <PlaceItem
-          key={`${place.id}-${index}`}
+          key={place.id}
           place={place}
           onSelectPlace={onSelectPlace}
           onToggleStatus={onToggleStatus}

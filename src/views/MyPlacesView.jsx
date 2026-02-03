@@ -24,6 +24,12 @@ export default function MyPlacesView({
     }));
   }
 
+  const selectValue =
+    sortState.key +
+    (sortState.direction === "desc" && sortState.key === "title"
+      ? "-desc"
+      : "");
+
   return (
     <section className="places-category">
       <h2>My Places</h2>
@@ -67,12 +73,12 @@ export default function MyPlacesView({
         />
 
         <select
-          value={sortState.key}
-          onClick={() => onToggleSort(sortState.key)}
+          value={selectValue}
           onChange={(e) => onToggleSort(e.target.value)}
         >
           <option value="createdAt">Recently added</option>
-          <option value="title">Title</option>
+          <option value="title">Title (A-Z)</option>
+          <option value="title-desc">Title (Z-A)</option>
           <option value="plannedDate">Planned date</option>
           <option value="status">Status</option>
         </select>
