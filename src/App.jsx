@@ -18,6 +18,9 @@ import {
   updatePlaceMeta,
 } from "./utils/api.js";
 
+const FILTER_STORAGE_KEY = "ppp.filterState";
+const SORT_STORAGE_KEY = "ppp.sortState";
+
 const INITIAL_FILTER_STATE = {
   status: [],
   favoritesOnly: false,
@@ -99,6 +102,15 @@ function placesReducer(state, action) {
   }
 }
 
+function loadFromStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function App() {
   const [placesState, dispatch] = useReducer(placesReducer, initialState);
 
@@ -106,8 +118,12 @@ export default function App() {
   const [isAuthConfirmed, setIsAuthConfirmed] = useState(false);
   const [showEmailError, setShowEmailError] = useState(false);
 
-  const [filterState, setFilterState] = useState(INITIAL_FILTER_STATE);
-  const [sortState, setSortState] = useState(INITIAL_SORT_STATE);
+  const [filterState, setFilterState] = useState(() =>
+    loadFromStorage(FILTER_STORAGE_KEY, INITIAL_FILTER_STATE),
+  );
+  const [sortState, setSortState] = useState(() =>
+    loadFromStorage(SORT_STORAGE_KEY, INITIAL_SORT_STATE),
+  );
 
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [notesPlace, setNotesPlace] = useState(null);
@@ -126,6 +142,14 @@ export default function App() {
       dispatch({ type: "LOAD_USER_PLACES", places: data.places }),
     );
   }, [editModeEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
+  }, [filterState]);
+
+  useEffect(() => {
+    localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify(sortState));
+  }, [sortState]);
 
   function handleEmailSubmit(e) {
     e.preventDefault();
@@ -269,6 +293,8 @@ export default function App() {
                   onResetFiltersAndSort={() => {
                     setFilterState(INITIAL_FILTER_STATE);
                     setSortState(INITIAL_SORT_STATE);
+                    localStorage.removeItem(FILTER_STORAGE_KEY);
+                    localStorage.removeItem(SORT_STORAGE_KEY);
                   }}
                   onToggleSort={(key) =>
                     setSortState((prev) => {
@@ -280,7 +306,7 @@ export default function App() {
                       }
                       return {
                         key,
-                        direction: key === "plannedDate" ? "asc" : "asc",
+                        direction: "asc",
                       };
                     })
                   }
