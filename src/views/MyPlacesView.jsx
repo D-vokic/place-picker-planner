@@ -27,7 +27,6 @@ export default function MyPlacesView({
   function handleSortChange(e) {
     const value = e.target.value;
 
-    // Planned date has explicit toggle behavior handled in App
     if (value === "plannedDate") {
       onToggleSort("plannedDate");
       return;
@@ -47,6 +46,8 @@ export default function MyPlacesView({
     }
     return sortState.key;
   }
+
+  const showNoResults = !isLoading && places.length === 0;
 
   return (
     <section className="places-category">
@@ -103,15 +104,21 @@ export default function MyPlacesView({
         </button>
       </div>
 
-      <PlacesList
-        places={places}
-        onSelectPlace={onSelectPlace}
-        onToggleFavorite={onToggleFavorite}
-        onToggleStatus={onToggleStatus}
-        onOpenNotes={onOpenNotes}
-        disabled={isLoading}
-        highlightedPlaceId={recentlyAddedPlaceId}
-      />
+      {showNoResults && (
+        <p className="no-results">No places match the current filters.</p>
+      )}
+
+      {!showNoResults && (
+        <PlacesList
+          places={places}
+          onSelectPlace={onSelectPlace}
+          onToggleFavorite={onToggleFavorite}
+          onToggleStatus={onToggleStatus}
+          onOpenNotes={onOpenNotes}
+          disabled={isLoading}
+          highlightedPlaceId={recentlyAddedPlaceId}
+        />
+      )}
     </section>
   );
 }
