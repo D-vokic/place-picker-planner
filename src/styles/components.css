@@ -124,3 +124,31 @@
 .controls-grid button:active {
   transform: translateY(1px);
 }
+
+.controls-grid select {
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 255, 0.45);
+  background: #1f1c2c;
+  color: #8feeff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.controls-grid select:focus {
+  outline: none;
+  border-color: rgba(255, 217, 0, 0.9);
+  box-shadow: 0 0 0 2px rgba(255, 217, 0, 0.25);
+}
+
+.controls-grid select.sort-active {
+  border-color: gold;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.25);
+}
+
+.sort-indicator {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}

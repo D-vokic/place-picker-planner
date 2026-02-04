@@ -24,11 +24,29 @@ export default function MyPlacesView({
     }));
   }
 
-  const selectValue =
-    sortState.key +
-    (sortState.direction === "desc" && sortState.key === "title"
-      ? "-desc"
-      : "");
+  function handleSortChange(e) {
+    const value = e.target.value;
+
+    // Planned date has explicit toggle behavior handled in App
+    if (value === "plannedDate") {
+      onToggleSort("plannedDate");
+      return;
+    }
+
+    if (value.endsWith("-desc")) {
+      onToggleSort(value.replace("-desc", ""));
+      return;
+    }
+
+    onToggleSort(value);
+  }
+
+  function getSelectValue() {
+    if (sortState.key === "title" && sortState.direction === "desc") {
+      return "title-desc";
+    }
+    return sortState.key;
+  }
 
   return (
     <section className="places-category">
@@ -72,13 +90,10 @@ export default function MyPlacesView({
           onChange={(value) => setFilterState((s) => ({ ...s, search: value }))}
         />
 
-        <select
-          value={selectValue}
-          onChange={(e) => onToggleSort(e.target.value)}
-        >
+        <select value={getSelectValue()} onChange={handleSortChange}>
           <option value="createdAt">Recently added</option>
-          <option value="title">Title (A-Z)</option>
-          <option value="title-desc">Title (Z-A)</option>
+          <option value="title">Title (A–Z)</option>
+          <option value="title-desc">Title (Z–A)</option>
           <option value="plannedDate">Planned date</option>
           <option value="status">Status</option>
         </select>

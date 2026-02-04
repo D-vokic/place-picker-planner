@@ -208,11 +208,9 @@ export default function App() {
         }
 
         if (aHas && bHas) {
-          const aDate = a.meta.plannedDate;
-          const bDate = b.meta.plannedDate;
           return sortState.direction === "asc"
-            ? aDate.localeCompare(bDate)
-            : bDate.localeCompare(aDate);
+            ? a.meta.plannedDate.localeCompare(b.meta.plannedDate)
+            : b.meta.plannedDate.localeCompare(a.meta.plannedDate);
         }
 
         return 0;
@@ -272,10 +270,18 @@ export default function App() {
                     setFilterState(INITIAL_FILTER_STATE);
                     setSortState(INITIAL_SORT_STATE);
                   }}
-                  onToggleSort={(value) =>
-                    setSortState({
-                      key: value.endsWith("-desc") ? value.slice(0, -5) : value,
-                      direction: value.endsWith("-desc") ? "desc" : "asc",
+                  onToggleSort={(key) =>
+                    setSortState((prev) => {
+                      if (prev.key === key) {
+                        return {
+                          key,
+                          direction: prev.direction === "asc" ? "desc" : "asc",
+                        };
+                      }
+                      return {
+                        key,
+                        direction: key === "plannedDate" ? "asc" : "asc",
+                      };
                     })
                   }
                 />
