@@ -191,6 +191,10 @@ app.patch(
   },
 );
 
-app.listen(3000, () => {
-  console.log("Backend running on http://localhost:3000");
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(3000, () => {
+    console.log("Backend running on http://localhost:3000");
+  });
+}
+
+export default app;
