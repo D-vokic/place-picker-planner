@@ -1,6 +1,8 @@
 import { useEffect, useReducer, useState, useMemo } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import "./styles/modal.css";
+
 import MyPlacesView from "./views/MyPlacesView.jsx";
 import AvailablePlacesView from "./views/AvailablePlacesView.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";

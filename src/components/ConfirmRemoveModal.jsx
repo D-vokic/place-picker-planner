@@ -9,12 +9,12 @@ export default function ConfirmRemoveModal({ place, onCancel, onConfirm }) {
         <strong>{place.title}</strong>
 
         <div className="modal-actions">
-          <button type="button" onClick={onCancel}>
+          <button type="button" onClick={onCancel} className="button-text">
             Cancel
           </button>
           <button
             type="button"
-            className="danger"
+            className="button"
             onClick={() => onConfirm(place.id)}
             data-testid="confirm-delete"
           >
