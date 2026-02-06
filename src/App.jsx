@@ -70,7 +70,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: state.userPlaces.map((p) =>
           p.id === action.placeId
-            ? { ...p, status: p.status === "visited" ? "want" : "visited" }
+            ? { ...p, status: p.status === "visited" ? undefined : "visited" }
             : p,
         ),
       };
@@ -129,12 +129,8 @@ export default function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [notesPlace, setNotesPlace] = useState(null);
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  const isEmailValid = emailPattern.test(email);
-  const editModeEnabled = isAuthConfirmed;
-
   useEffect(() => {
-    if (!editModeEnabled) {
+    if (!isAuthConfirmed) {
       dispatch({ type: "RESET_USER_STATE" });
       return;
     }
@@ -142,19 +138,12 @@ export default function App() {
     fetchUserPlaces().then((data) =>
       dispatch({ type: "LOAD_USER_PLACES", places: data.places }),
     );
-  }, [editModeEnabled]);
-
-  useEffect(() => {
-    localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
-  }, [filterState]);
-
-  useEffect(() => {
-    localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify(sortState));
-  }, [sortState]);
+  }, [isAuthConfirmed]);
 
   function handleEmailSubmit(e) {
     e.preventDefault();
-    if (!isEmailValid) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailPattern.test(email)) {
       setShowEmailError(true);
       setIsAuthConfirmed(false);
       return;
@@ -163,50 +152,21 @@ export default function App() {
     setIsAuthConfirmed(true);
   }
 
-  function handleToggleFavorite(placeId) {
-    dispatch({ type: "TOGGLE_FAVORITE", placeId });
-    togglePlaceFavorite(placeId);
-  }
-
-  function handleToggleStatus(placeId) {
-    dispatch({ type: "TOGGLE_STATUS", placeId });
-    togglePlaceStatus(placeId);
-  }
-
-  function handleSelectAvailablePlace(place) {
-    dispatch({ type: "ADD_PLACE", place });
-    addUserPlace(place);
-  }
-
-  function handleSelectPlace(place) {
-    setSelectedPlace(place);
-  }
-
-  function handleOpenNotes(place) {
-    setNotesPlace(place);
-  }
-
-  function handleSaveNotes(placeId, meta) {
-    dispatch({ type: "UPDATE_META", placeId, meta });
-    updatePlaceMeta(placeId, meta);
-    setNotesPlace(null);
-  }
-
-  function handleCancelNotes() {
-    setNotesPlace(null);
-  }
-
-  function handleConfirmRemove(placeId) {
-    dispatch({ type: "REMOVE_PLACE", placeId });
-    removeUserPlace(placeId);
-    setSelectedPlace(null);
-  }
-
   const filteredPlaces = useMemo(() => {
     let result = [...placesState.userPlaces];
 
     if (filterState.status.length > 0) {
-      result = result.filter((p) => filterState.status.includes(p.status));
+      result = result.filter((p) => {
+        if (filterState.status.includes("visited") && p.status === "visited") {
+          return true;
+        }
+
+        if (filterState.status.includes("want") && p.status !== "visited") {
+          return true;
+        }
+
+        return false;
+      });
     }
 
     if (filterState.favoritesOnly) {
@@ -218,39 +178,8 @@ export default function App() {
       result = result.filter((p) => p.title.toLowerCase().includes(q));
     }
 
-    result.sort((a, b) => {
-      if (sortState.key === "plannedDate") {
-        const aHas = Boolean(a.meta?.plannedDate);
-        const bHas = Boolean(b.meta?.plannedDate);
-
-        if (aHas !== bHas) {
-          return sortState.direction === "asc" ? bHas - aHas : aHas - bHas;
-        }
-
-        if (aHas && bHas) {
-          return sortState.direction === "asc"
-            ? a.meta.plannedDate.localeCompare(b.meta.plannedDate)
-            : b.meta.plannedDate.localeCompare(a.meta.plannedDate);
-        }
-
-        return 0;
-      }
-
-      let aVal = a[sortState.key];
-      let bVal = b[sortState.key];
-
-      if (typeof aVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (aVal < bVal) return sortState.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortState.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-
     return result;
-  }, [placesState.userPlaces, filterState, sortState]);
+  }, [placesState.userPlaces, filterState]);
 
   return (
     <BrowserRouter>
@@ -275,40 +204,38 @@ export default function App() {
           path="/"
           element={
             <main>
-              {editModeEnabled && (
+              {isAuthConfirmed && (
                 <MyPlacesView
                   places={filteredPlaces}
                   isLoading={placesState.isLoadingUserPlaces}
                   filterState={filterState}
                   setFilterState={setFilterState}
                   sortState={sortState}
-                  onToggleFavorite={handleToggleFavorite}
-                  onToggleStatus={handleToggleStatus}
-                  onOpenNotes={handleOpenNotes}
-                  onSelectPlace={handleSelectPlace}
-                  onConfirmRemove={handleConfirmRemove}
-                  selectedPlace={selectedPlace}
+                  onToggleFavorite={(id) =>
+                    dispatch({ type: "TOGGLE_FAVORITE", placeId: id })
+                  }
+                  onToggleStatus={(id) =>
+                    dispatch({ type: "TOGGLE_STATUS", placeId: id })
+                  }
+                  onOpenNotes={setNotesPlace}
+                  onSelectPlace={setSelectedPlace}
+                  onConfirmRemove={(id) => {
+                    dispatch({ type: "REMOVE_PLACE", placeId: id });
+                    removeUserPlace(id);
+                    setSelectedPlace(null);
+                  }}
                   onResetFiltersAndSort={() => {
                     setFilterState(INITIAL_FILTER_STATE);
                     setSortState(INITIAL_SORT_STATE);
                     localStorage.removeItem(FILTER_STORAGE_KEY);
                     localStorage.removeItem(SORT_STORAGE_KEY);
                   }}
-                  onToggleSort={(key) =>
-                    setSortState((prev) => {
-                      if (prev.key === key) {
-                        return {
-                          key,
-                          direction: prev.direction === "asc" ? "desc" : "asc",
-                        };
-                      }
-                      return { key, direction: "asc" };
-                    })
-                  }
+                  onToggleSort={() => {}}
+                  selectedPlace={selectedPlace}
                 />
               )}
 
-              <AvailablePlacesView onSelectPlace={handleSelectAvailablePlace} />
+              <AvailablePlacesView />
             </main>
           }
         />
@@ -318,8 +245,12 @@ export default function App() {
       {notesPlace && (
         <ModalEditorNotes
           place={notesPlace}
-          onCancel={handleCancelNotes}
-          onSave={handleSaveNotes}
+          onCancel={() => setNotesPlace(null)}
+          onSave={(id, meta) => {
+            dispatch({ type: "UPDATE_META", placeId: id, meta });
+            updatePlaceMeta(id, meta);
+            setNotesPlace(null);
+          }}
         />
       )}
     </BrowserRouter>
