@@ -18,16 +18,21 @@ export default function Places({
   const hasPlaces = places.length > 0;
 
   return (
-    <section className="places-category">
+    <section
+      className="places-category"
+      data-testid={title === "My Places" ? "my-places" : undefined}
+    >
       <div className="places-header">
         <h2>{title}</h2>
-        <button
-          className={`fav-filter-btn ${favoriteOnly ? "active" : ""}`}
-          onClick={() => setFavoriteOnly(!favoriteOnly)}
-          aria-pressed={favoriteOnly}
-        >
-          {favoriteOnly ? "⭐ Favorites" : "☆ Favorites"}
-        </button>
+        {typeof setFavoriteOnly === "function" && (
+          <button
+            className={`fav-filter-btn ${favoriteOnly ? "active" : ""}`}
+            onClick={() => setFavoriteOnly(!favoriteOnly)}
+            aria-pressed={favoriteOnly}
+          >
+            {favoriteOnly ? "⭐ Favorites" : "☆ Favorites"}
+          </button>
+        )}
       </div>
 
       {isLoading && (

@@ -24,7 +24,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
       },
       () => {
         setUserLocation(null);
-      }
+      },
     );
   }, []);
 
@@ -95,7 +95,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
   }, [availablePlaces, selectedCategory, searchTerm, userLocation]);
 
   return (
-    <>
+    <section data-testid="available-places">
       <SearchInput value={searchTerm} onChange={setSearchTerm} />
 
       <CategoryFilter
@@ -112,6 +112,6 @@ export default function AvailablePlaces({ onSelectPlace }) {
         fallbackText="No places match your search."
         onSelectPlace={onSelectPlace}
       />
-    </>
+    </section>
   );
 }

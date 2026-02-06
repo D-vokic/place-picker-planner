@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
 
-/**
- * Reducer copied verbatim from App.jsx
- * (Reducer logic must be tested in isolation)
- */
-
 const initialState = {
   userPlaces: [],
   isLoadingUserPlaces: true,

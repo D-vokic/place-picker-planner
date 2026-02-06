@@ -13,7 +13,10 @@ export default function PlaceItem({
   const hasNotes = Boolean(place.meta?.notes);
 
   return (
-    <li className={`place-item ${highlight ? "highlight" : ""}`}>
+    <li
+      className={`place-item ${highlight ? "highlight" : ""}`}
+      data-testid="place-item"
+    >
       <div className="place-header">
         <button
           type="button"
@@ -24,6 +27,7 @@ export default function PlaceItem({
               : undefined
           }
           disabled={disabled}
+          data-testid="add-place"
         >
           <img src={place.imageUrl} alt={place.imageAlt} />
         </button>
@@ -36,6 +40,7 @@ export default function PlaceItem({
             onToggleFavorite(place.id);
           }}
           disabled={disabled}
+          data-testid="toggle-favorite"
         >
           {isFavorite ? "★" : "☆"}
         </button>
@@ -51,6 +56,7 @@ export default function PlaceItem({
           className="status-toggle"
           onClick={() => onToggleStatus(place.id)}
           disabled={disabled}
+          data-testid="toggle-status"
         >
           {place.status === "visited" ? "Visited" : "Want to visit"}
         </button>
@@ -62,6 +68,16 @@ export default function PlaceItem({
           disabled={disabled}
         >
           Notes{hasNotes ? "*" : ""}
+        </button>
+
+        <button
+          type="button"
+          className="delete-btn"
+          onClick={() => onSelectPlace(place)}
+          disabled={disabled}
+          data-testid="delete-place"
+        >
+          Delete
         </button>
       </div>
 

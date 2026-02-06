@@ -181,8 +181,6 @@ app.delete("/user-places/:id", async (req, res) => {
   res.json({ message: "Place removed." });
 });
 
-/* ===== V2 ALIAS (NO BREAKAGE) ===== */
-
 app.patch(
   "/collections/:collectionId/places/:placeId/status",
   async (req, res) => {

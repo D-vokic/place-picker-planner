@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MyPlacesView from "./views/MyPlacesView.jsx";
 import AvailablePlacesView from "./views/AvailablePlacesView.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
-import DeleteConfirmation from "./components/DeleteConfirmation.jsx";
 import ModalEditorNotes from "./components/ModalEditorNotes.jsx";
 
 import logoImg from "./assets/logoImg.svg";
@@ -195,14 +194,9 @@ export default function App() {
     setNotesPlace(null);
   }
 
-  function handleCancelRemove() {
-    setSelectedPlace(null);
-  }
-
-  function handleConfirmRemove() {
-    if (!selectedPlace) return;
-    dispatch({ type: "REMOVE_PLACE", placeId: selectedPlace.id });
-    removeUserPlace(selectedPlace.id);
+  function handleConfirmRemove(placeId) {
+    dispatch({ type: "REMOVE_PLACE", placeId });
+    removeUserPlace(placeId);
     setSelectedPlace(null);
   }
 
@@ -290,6 +284,8 @@ export default function App() {
                   onToggleStatus={handleToggleStatus}
                   onOpenNotes={handleOpenNotes}
                   onSelectPlace={handleSelectPlace}
+                  onConfirmRemove={handleConfirmRemove}
+                  selectedPlace={selectedPlace}
                   onResetFiltersAndSort={() => {
                     setFilterState(INITIAL_FILTER_STATE);
                     setSortState(INITIAL_SORT_STATE);
@@ -304,10 +300,7 @@ export default function App() {
                           direction: prev.direction === "asc" ? "desc" : "asc",
                         };
                       }
-                      return {
-                        key,
-                        direction: "asc",
-                      };
+                      return { key, direction: "asc" };
                     })
                   }
                 />
@@ -319,13 +312,6 @@ export default function App() {
         />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
-
-      {selectedPlace && (
-        <DeleteConfirmation
-          onCancel={handleCancelRemove}
-          onConfirm={handleConfirmRemove}
-        />
-      )}
 
       {notesPlace && (
         <ModalEditorNotes

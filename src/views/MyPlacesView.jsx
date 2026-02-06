@@ -1,5 +1,6 @@
 import PlacesList from "../components/PlacesList.jsx";
 import SearchInput from "../components/SearchInput.jsx";
+import ConfirmRemoveModal from "../components/ConfirmRemoveModal.jsx";
 
 export default function MyPlacesView({
   places,
@@ -14,6 +15,8 @@ export default function MyPlacesView({
   onOpenNotes,
   onSelectPlace,
   recentlyAddedPlaceId,
+  selectedPlace,
+  onConfirmRemove,
 }) {
   function toggleStatusFilter(status) {
     setFilterState((s) => ({
@@ -50,7 +53,7 @@ export default function MyPlacesView({
   const showNoResults = !isLoading && places.length === 0;
 
   return (
-    <section className="places-category">
+    <section className="places-category" data-testid="my-places">
       <h2>My Places</h2>
 
       <div className="controls-grid">
@@ -119,6 +122,12 @@ export default function MyPlacesView({
           highlightedPlaceId={recentlyAddedPlaceId}
         />
       )}
+
+      <ConfirmRemoveModal
+        place={selectedPlace}
+        onCancel={() => onSelectPlace(null)}
+        onConfirm={onConfirmRemove}
+      />
     </section>
   );
 }

@@ -108,7 +108,10 @@ export default function AvailablePlacesView({ onSelectPlace }) {
             />
           </div>
 
-          <section className="places-category available-places">
+          <section
+            className="places-category available-places"
+            data-testid="available-places"
+          >
             <h2>Available Places</h2>
 
             {isFetching && (

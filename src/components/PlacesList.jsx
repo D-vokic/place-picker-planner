@@ -23,6 +23,7 @@ export default function PlacesList({
           showMapPreview={showMapPreview}
           disabled={disabled}
           highlight={highlightedPlaceId === place.id}
+          data-testid="place-item"
         />
       ))}
     </ul>

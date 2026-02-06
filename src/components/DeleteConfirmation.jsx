@@ -20,6 +20,7 @@ export default function DeleteConfirmation({ onCancel, onConfirm }) {
           onClick={onConfirm}
           className="button"
           aria-label="Confirm removal"
+          data-testid="confirm-delete"
         >
           Remove
         </button>
