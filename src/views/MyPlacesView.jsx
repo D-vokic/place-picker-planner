@@ -30,6 +30,11 @@ export default function MyPlacesView({
   function handleSortChange(e) {
     const value = e.target.value;
 
+    if (value === "createdAt") {
+      onToggleSort("createdAt");
+      return;
+    }
+
     if (value === "plannedDate") {
       onToggleSort("plannedDate");
       return;
@@ -44,6 +49,9 @@ export default function MyPlacesView({
   }
 
   function getSelectValue() {
+    if (sortState.key === "createdAt") {
+      return "createdAt";
+    }
     if (sortState.key === "title" && sortState.direction === "desc") {
       return "title-desc";
     }
