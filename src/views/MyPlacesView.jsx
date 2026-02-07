@@ -31,21 +31,21 @@ export default function MyPlacesView({
     const value = e.target.value;
 
     if (value === "createdAt") {
-      onToggleSort("createdAt");
+      onToggleSort("createdAt", "desc");
       return;
     }
 
     if (value === "plannedDate") {
-      onToggleSort("plannedDate");
+      onToggleSort("plannedDate", "asc");
       return;
     }
 
     if (value.endsWith("-desc")) {
-      onToggleSort(value.replace("-desc", ""));
+      onToggleSort(value.replace("-desc", ""), "desc");
       return;
     }
 
-    onToggleSort(value);
+    onToggleSort(value, "asc");
   }
 
   function getSelectValue() {

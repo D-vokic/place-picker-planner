@@ -238,6 +238,9 @@ export default function App() {
                   filterState={filterState}
                   setFilterState={setFilterState}
                   sortState={sortState}
+                  onToggleSort={(key, direction) =>
+                    setSortState({ key, direction })
+                  }
                   onToggleFavorite={(id) => {
                     dispatch({ type: "TOGGLE_FAVORITE", placeId: id });
                     togglePlaceFavorite(id);
@@ -259,15 +262,6 @@ export default function App() {
                     localStorage.removeItem(FILTER_STORAGE_KEY);
                     localStorage.removeItem(SORT_STORAGE_KEY);
                   }}
-                  onToggleSort={(key) =>
-                    setSortState((prev) => ({
-                      key,
-                      direction:
-                        prev.key === key && prev.direction === "asc"
-                          ? "desc"
-                          : "asc",
-                    }))
-                  }
                   selectedPlace={selectedPlace}
                 />
               )}
