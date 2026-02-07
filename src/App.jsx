@@ -199,11 +199,18 @@ export default function App() {
           return a.meta.plannedDate.localeCompare(b.meta.plannedDate);
         }
 
-        // Phase 2: planned dates last (desc)
         if (aHas && !bHas) return 1;
         if (!aHas && bHas) return -1;
         if (!aHas && !bHas) return 0;
         return b.meta.plannedDate.localeCompare(a.meta.plannedDate);
+      }
+
+      if (sortState.key === "status") {
+        const order =
+          sortState.direction === "asc"
+            ? { want: 0, visited: 1 }
+            : { visited: 0, want: 1 };
+        return order[a.status] - order[b.status];
       }
 
       const aVal = a[sortState.key].toLowerCase();
