@@ -224,6 +224,12 @@ export default function App() {
             />
           </form>
         )}
+
+        {isAuthConfirmed && (
+          <p className="auth-indicator">
+            Edit mode enabled for <strong>{email}</strong>
+          </p>
+        )}
       </header>
 
       <Routes>
