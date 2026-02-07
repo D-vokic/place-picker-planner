@@ -25,7 +25,6 @@ const SORT_STORAGE_KEY = "ppp.sortState";
 const INITIAL_FILTER_STATE = {
   status: [],
   favoritesOnly: false,
-  plannedDate: { mode: "any", value: null },
   search: "",
 };
 
@@ -44,17 +43,17 @@ function placesReducer(state, action) {
     case "LOAD_USER_PLACES":
       return {
         ...state,
-        userPlaces: action.places.map((p) => ({
-          ...p,
-          isFavorite: p.isFavorite === true,
-        })),
+        userPlaces: action.places,
         isLoadingUserPlaces: false,
       };
 
     case "ADD_PLACE":
+      if (state.userPlaces.some((p) => p.id === action.place.id)) {
+        return state;
+      }
       return {
         ...state,
-        userPlaces: [...state.userPlaces, action.place],
+        userPlaces: [action.place, ...state.userPlaces],
       };
 
     case "TOGGLE_FAVORITE":
@@ -166,15 +165,11 @@ export default function App() {
     let result = [...placesState.userPlaces];
 
     if (filterState.status.length > 0) {
-      result = result.filter((p) => {
-        if (filterState.status.includes("visited") && p.status === "visited") {
-          return true;
-        }
-        if (filterState.status.includes("want") && p.status !== "visited") {
-          return true;
-        }
-        return false;
-      });
+      result = result.filter((p) =>
+        filterState.status.includes(
+          p.status === "visited" ? "visited" : "want",
+        ),
+      );
     }
 
     if (filterState.favoritesOnly) {
@@ -187,34 +182,25 @@ export default function App() {
     }
 
     result.sort((a, b) => {
+      if (sortState.key === "createdAt") {
+        return sortState.direction === "desc"
+          ? b.createdAt - a.createdAt
+          : a.createdAt - b.createdAt;
+      }
+
       if (sortState.key === "plannedDate") {
-        const aHas = Boolean(a.meta?.plannedDate);
-        const bHas = Boolean(b.meta?.plannedDate);
-
-        if (aHas !== bHas) {
-          return sortState.direction === "asc" ? bHas - aHas : aHas - bHas;
-        }
-
-        if (aHas && bHas) {
-          return sortState.direction === "asc"
-            ? a.meta.plannedDate.localeCompare(b.meta.plannedDate)
-            : b.meta.plannedDate.localeCompare(a.meta.plannedDate);
-        }
-
-        return 0;
+        const aDate = a.meta?.plannedDate || "";
+        const bDate = b.meta?.plannedDate || "";
+        return sortState.direction === "asc"
+          ? aDate.localeCompare(bDate)
+          : bDate.localeCompare(aDate);
       }
 
-      let aVal = a[sortState.key];
-      let bVal = b[sortState.key];
-
-      if (typeof aVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (aVal < bVal) return sortState.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortState.direction === "asc" ? 1 : -1;
-      return 0;
+      const aVal = a[sortState.key].toLowerCase();
+      const bVal = b[sortState.key].toLowerCase();
+      return sortState.direction === "asc"
+        ? aVal.localeCompare(bVal)
+        : bVal.localeCompare(aVal);
     });
 
     return result;
@@ -227,15 +213,17 @@ export default function App() {
         <h1>PLACE PICKER PLANNER</h1>
         <p>Save and organize places you want to visit.</p>
 
-        <form onSubmit={handleEmailSubmit}>
-          <input
-            type="email"
-            placeholder="Enter email to enable editing"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-invalid={showEmailError}
-          />
-        </form>
+        {!isAuthConfirmed && (
+          <form onSubmit={handleEmailSubmit}>
+            <input
+              type="email"
+              placeholder="Enter email to enable editing"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={showEmailError}
+            />
+          </form>
+        )}
       </header>
 
       <Routes>
@@ -272,31 +260,24 @@ export default function App() {
                     localStorage.removeItem(SORT_STORAGE_KEY);
                   }}
                   onToggleSort={(key) =>
-                    setSortState((prev) => {
-                      if (prev.key === key) {
-                        return {
-                          key,
-                          direction: prev.direction === "asc" ? "desc" : "asc",
-                        };
-                      }
-                      return {
-                        key,
-                        direction: key === "createdAt" ? "desc" : "asc",
-                      };
-                    })
+                    setSortState((prev) => ({
+                      key,
+                      direction:
+                        prev.key === key && prev.direction === "asc"
+                          ? "desc"
+                          : "asc",
+                    }))
                   }
                   selectedPlace={selectedPlace}
                 />
               )}
 
               <AvailablePlacesView
+                isReadOnly={!isAuthConfirmed}
                 onSelectPlace={(place) => {
-                  const placeWithTimestamp = {
-                    ...place,
-                    createdAt: Date.now(),
-                  };
-                  dispatch({ type: "ADD_PLACE", place: placeWithTimestamp });
-                  addUserPlace(placeWithTimestamp);
+                  if (!isAuthConfirmed) return;
+                  dispatch({ type: "ADD_PLACE", place });
+                  addUserPlace(place);
                 }}
               />
             </main>
@@ -305,7 +286,7 @@ export default function App() {
         <Route path="*" element={<ErrorPage />} />
       </Routes>
 
-      {notesPlace && (
+      {notesPlace && isAuthConfirmed && (
         <ModalEditorNotes
           place={notesPlace}
           onCancel={() => setNotesPlace(null)}

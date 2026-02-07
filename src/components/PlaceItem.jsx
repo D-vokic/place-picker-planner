@@ -37,7 +37,9 @@ export default function PlaceItem({
           className={`favorite-toggle ${isFavorite ? "active" : ""}`}
           onClick={(e) => {
             e.stopPropagation();
-            onToggleFavorite(place.id);
+            if (typeof onToggleFavorite === "function") {
+              onToggleFavorite(place.id);
+            }
           }}
           disabled={disabled}
           data-testid="toggle-favorite"
@@ -54,7 +56,11 @@ export default function PlaceItem({
         <button
           type="button"
           className="status-toggle"
-          onClick={() => onToggleStatus(place.id)}
+          onClick={() => {
+            if (typeof onToggleStatus === "function") {
+              onToggleStatus(place.id);
+            }
+          }}
           disabled={disabled}
           data-testid="toggle-status"
         >
@@ -64,7 +70,11 @@ export default function PlaceItem({
         <button
           type="button"
           className="notes-btn"
-          onClick={() => onOpenNotes(place)}
+          onClick={() => {
+            if (typeof onOpenNotes === "function") {
+              onOpenNotes(place);
+            }
+          }}
           disabled={disabled}
         >
           Notes{hasNotes ? "*" : ""}
@@ -73,7 +83,11 @@ export default function PlaceItem({
         <button
           type="button"
           className="delete-btn"
-          onClick={() => onSelectPlace(place)}
+          onClick={() => {
+            if (typeof onSelectPlace === "function") {
+              onSelectPlace(place);
+            }
+          }}
           disabled={disabled}
           data-testid="delete-place"
         >
