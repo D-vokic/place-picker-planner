@@ -6,7 +6,7 @@ import SearchInput from "../components/SearchInput.jsx";
 import { fetchPlaces } from "../utils/api.js";
 import { sortPlacesByDistance } from "../loc.js";
 
-export default function AvailablePlacesView({ onSelectPlace }) {
+export default function AvailablePlacesView({ onSelectPlace, isReadOnly }) {
   const [isFetching, setIsFetching] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState([]);
   const [error, setError] = useState(null);
@@ -93,6 +93,11 @@ export default function AvailablePlacesView({ onSelectPlace }) {
     return result;
   }, [availablePlaces, selectedCategory, searchTerm, userLocation]);
 
+  function handleSelectPlace(place) {
+    if (isReadOnly) return;
+    onSelectPlace(place);
+  }
+
   return (
     <>
       {error && <ErrorPage title="Failed to load places" message={error} />}
@@ -127,8 +132,8 @@ export default function AvailablePlacesView({ onSelectPlace }) {
             {!isFetching && processedPlaces.length > 0 && (
               <PlacesList
                 places={processedPlaces}
-                onSelectPlace={onSelectPlace}
-                disabled={isFetching}
+                onSelectPlace={handleSelectPlace}
+                disabled={isFetching || isReadOnly}
                 showMapPreview={true}
                 recentlyAddedPlaceId={null}
               />
