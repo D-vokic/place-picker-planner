@@ -189,11 +189,21 @@ export default function App() {
       }
 
       if (sortState.key === "plannedDate") {
-        const aDate = a.meta?.plannedDate || "";
-        const bDate = b.meta?.plannedDate || "";
-        return sortState.direction === "asc"
-          ? aDate.localeCompare(bDate)
-          : bDate.localeCompare(aDate);
+        const aHas = Boolean(a.meta?.plannedDate);
+        const bHas = Boolean(b.meta?.plannedDate);
+
+        if (sortState.direction === "asc") {
+          if (aHas && !bHas) return -1;
+          if (!aHas && bHas) return 1;
+          if (!aHas && !bHas) return 0;
+          return a.meta.plannedDate.localeCompare(b.meta.plannedDate);
+        }
+
+        // Phase 2: planned dates last (desc)
+        if (aHas && !bHas) return 1;
+        if (!aHas && bHas) return -1;
+        if (!aHas && !bHas) return 0;
+        return b.meta.plannedDate.localeCompare(a.meta.plannedDate);
       }
 
       const aVal = a[sortState.key].toLowerCase();
