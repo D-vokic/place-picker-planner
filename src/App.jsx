@@ -12,10 +12,7 @@ import logoImg from "./assets/logoImg.svg";
 
 import {
   fetchUserPlaces,
-  togglePlaceFavorite,
-  togglePlaceStatus,
   removeUserPlace,
-  addUserPlace,
   updatePlaceMeta,
 } from "./utils/api.js";
 
@@ -179,8 +176,22 @@ export default function App() {
       result = result.filter((p) => p.title.toLowerCase().includes(q));
     }
 
+    result.sort((a, b) => {
+      let aVal = a[sortState.key];
+      let bVal = b[sortState.key];
+
+      if (typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sortState.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortState.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+
     return result;
-  }, [placesState.userPlaces, filterState]);
+  }, [placesState.userPlaces, filterState, sortState]);
 
   return (
     <BrowserRouter>
@@ -231,7 +242,17 @@ export default function App() {
                     localStorage.removeItem(FILTER_STORAGE_KEY);
                     localStorage.removeItem(SORT_STORAGE_KEY);
                   }}
-                  onToggleSort={() => {}}
+                  onToggleSort={(key) =>
+                    setSortState((prev) => {
+                      if (prev.key === key) {
+                        return {
+                          key,
+                          direction: prev.direction === "asc" ? "desc" : "asc",
+                        };
+                      }
+                      return { key, direction: "asc" };
+                    })
+                  }
                   selectedPlace={selectedPlace}
                 />
               )}
