@@ -46,7 +46,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: action.places.map((p) => ({
           ...p,
-          isFavorite: p.isFavorite === true,
+          isFavorite: Boolean(p.isFavorite),
         })),
         isLoadingUserPlaces: false,
       };
@@ -54,7 +54,10 @@ function placesReducer(state, action) {
     case "ADD_PLACE":
       return {
         ...state,
-        userPlaces: [...state.userPlaces, action.place],
+        userPlaces: [
+          ...state.userPlaces,
+          { ...action.place, isFavorite: Boolean(action.place.isFavorite) },
+        ],
       };
 
     case "TOGGLE_FAVORITE":
@@ -160,11 +163,9 @@ export default function App() {
         if (filterState.status.includes("visited") && p.status === "visited") {
           return true;
         }
-
         if (filterState.status.includes("want") && p.status !== "visited") {
           return true;
         }
-
         return false;
       });
     }
