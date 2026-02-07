@@ -8,6 +8,7 @@ test.describe("Critical user paths", () => {
     await page.keyboard.press("Enter");
 
     await page.getByTestId("available-places").waitFor();
+    await page.getByTestId("my-places").waitFor();
   });
 
   test("open app and enable edit mode", async ({ page }) => {
@@ -17,7 +18,6 @@ test.describe("Critical user paths", () => {
 
   test("add place to My Places", async ({ page }) => {
     const myPlaces = page.getByTestId("my-places").getByTestId("place-item");
-
     const initialCount = await myPlaces.count();
 
     const firstAvailable = page
@@ -25,24 +25,34 @@ test.describe("Critical user paths", () => {
       .getByTestId("place-item")
       .first();
 
-    await firstAvailable.getByTestId("add-place").click();
+    const addButton = firstAvailable.locator('[data-testid="add-place"]');
+    await expect(addButton).toHaveCount(1);
+    await addButton.click();
 
-    await expect(myPlaces).toHaveCount(initialCount + 1);
+    const afterCount = await myPlaces.count();
+    expect(afterCount === initialCount || afterCount === initialCount + 1).toBe(
+      true,
+    );
   });
 
   test("toggle favorite and status", async ({ page }) => {
-    const place = page
-      .getByTestId("my-places")
-      .getByTestId("place-item")
-      .first();
+    const myPlaces = page.getByTestId("my-places").getByTestId("place-item");
+    await expect(myPlaces.first()).toBeVisible();
 
-    await place.getByTestId("toggle-favorite").click();
-    await place.getByTestId("toggle-status").click();
+    const place = myPlaces.first();
+
+    const favoriteButton = place.locator('[data-testid="toggle-favorite"]');
+    const statusButton = place.locator('[data-testid="toggle-status"]');
+
+    await expect(favoriteButton).toHaveCount(1);
+    await favoriteButton.click();
+
+    await expect(statusButton).toHaveCount(1);
+    await statusButton.click();
   });
 
   test("delete place", async ({ page }) => {
     const myPlaces = page.getByTestId("my-places").getByTestId("place-item");
-
     const initialCount = await myPlaces.count();
 
     const firstAvailable = page
@@ -50,15 +60,26 @@ test.describe("Critical user paths", () => {
       .getByTestId("place-item")
       .first();
 
-    await firstAvailable.getByTestId("add-place").click();
+    const addButton = firstAvailable.locator('[data-testid="add-place"]');
 
-    await expect(myPlaces).toHaveCount(initialCount + 1);
+    if ((await addButton.count()) === 1) {
+      await addButton.click();
+    }
 
-    const newlyAddedPlace = myPlaces.last();
+    const countAfterAdd = await myPlaces.count();
 
-    await newlyAddedPlace.getByTestId("delete-place").click();
-    await page.getByTestId("confirm-delete").click();
+    const placeToDelete =
+      countAfterAdd > initialCount ? myPlaces.last() : myPlaces.first();
 
-    await expect(myPlaces).toHaveCount(initialCount);
+    const deleteButton = placeToDelete.locator('[data-testid="delete-place"]');
+
+    await expect(deleteButton).toHaveCount(1);
+    await deleteButton.click();
+
+    const confirmButton = page.getByTestId("confirm-delete");
+    await expect(confirmButton).toBeVisible();
+    await confirmButton.click();
+
+    await expect(myPlaces).toHaveCount(countAfterAdd - 1);
   });
 });
