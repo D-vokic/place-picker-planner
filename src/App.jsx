@@ -12,7 +12,10 @@ import logoImg from "./assets/logoImg.svg";
 
 import {
   fetchUserPlaces,
+  togglePlaceFavorite,
+  togglePlaceStatus,
   removeUserPlace,
+  addUserPlace,
   updatePlaceMeta,
 } from "./utils/api.js";
 
@@ -27,8 +30,8 @@ const INITIAL_FILTER_STATE = {
 };
 
 const INITIAL_SORT_STATE = {
-  key: "title",
-  direction: "asc",
+  key: "createdAt",
+  direction: "desc",
 };
 
 const initialState = {
@@ -43,7 +46,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: action.places.map((p) => ({
           ...p,
-          isFavorite: Boolean(p.isFavorite),
+          isFavorite: p.isFavorite === true,
         })),
         isLoadingUserPlaces: false,
       };
@@ -51,10 +54,7 @@ function placesReducer(state, action) {
     case "ADD_PLACE":
       return {
         ...state,
-        userPlaces: [
-          ...state.userPlaces,
-          { ...action.place, isFavorite: Boolean(action.place.isFavorite) },
-        ],
+        userPlaces: [...state.userPlaces, action.place],
       };
 
     case "TOGGLE_FAVORITE":
@@ -70,7 +70,7 @@ function placesReducer(state, action) {
         ...state,
         userPlaces: state.userPlaces.map((p) =>
           p.id === action.placeId
-            ? { ...p, status: p.status === "visited" ? undefined : "visited" }
+            ? { ...p, status: p.status === "visited" ? "want" : "visited" }
             : p,
         ),
       };
@@ -140,29 +140,15 @@ export default function App() {
     );
   }, [isAuthConfirmed]);
 
-  function handleEmailSubmit(e) {
-    e.preventDefault();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (!emailPattern.test(email)) {
-      setShowEmailError(true);
-      setIsAuthConfirmed(false);
-      return;
-    }
-    setShowEmailError(false);
-    setIsAuthConfirmed(true);
-  }
-
   const filteredPlaces = useMemo(() => {
     let result = [...placesState.userPlaces];
 
     if (filterState.status.length > 0) {
       result = result.filter((p) => {
-        if (filterState.status.includes("visited") && p.status === "visited") {
+        if (filterState.status.includes("visited") && p.status === "visited")
           return true;
-        }
-        if (filterState.status.includes("want") && p.status !== "visited") {
+        if (filterState.status.includes("want") && p.status !== "visited")
           return true;
-        }
         return false;
       });
     }
@@ -177,16 +163,28 @@ export default function App() {
     }
 
     result.sort((a, b) => {
-      let aVal = a[sortState.key];
-      let bVal = b[sortState.key];
-
-      if (typeof aVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
+      if (sortState.key === "createdAt") {
+        return sortState.direction === "desc"
+          ? new Date(b.createdAt) - new Date(a.createdAt)
+          : new Date(a.createdAt) - new Date(b.createdAt);
       }
 
-      if (aVal < bVal) return sortState.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortState.direction === "asc" ? 1 : -1;
+      if (sortState.key === "title") {
+        return sortState.direction === "asc"
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      }
+
+      if (sortState.key === "plannedDate") {
+        const aDate = a.meta?.plannedDate || "";
+        const bDate = b.meta?.plannedDate || "";
+        return aDate.localeCompare(bDate);
+      }
+
+      if (sortState.key === "status") {
+        return a.status.localeCompare(b.status);
+      }
+
       return 0;
     });
 
@@ -200,7 +198,17 @@ export default function App() {
         <h1>PLACE PICKER PLANNER</h1>
         <p>Save and organize places you want to visit.</p>
 
-        <form onSubmit={handleEmailSubmit}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!email.includes("@")) {
+              setShowEmailError(true);
+              return;
+            }
+            setShowEmailError(false);
+            setIsAuthConfirmed(true);
+          }}
+        >
           <input
             type="email"
             placeholder="Enter email to enable editing"
@@ -223,6 +231,19 @@ export default function App() {
                   filterState={filterState}
                   setFilterState={setFilterState}
                   sortState={sortState}
+                  onToggleSort={(key) =>
+                    setSortState((prev) => ({
+                      key,
+                      direction:
+                        prev.key === key && prev.direction === "asc"
+                          ? "desc"
+                          : "asc",
+                    }))
+                  }
+                  onResetFiltersAndSort={() => {
+                    setFilterState(INITIAL_FILTER_STATE);
+                    setSortState(INITIAL_SORT_STATE);
+                  }}
                   onToggleFavorite={(id) =>
                     dispatch({ type: "TOGGLE_FAVORITE", placeId: id })
                   }
@@ -231,33 +252,21 @@ export default function App() {
                   }
                   onOpenNotes={setNotesPlace}
                   onSelectPlace={setSelectedPlace}
+                  selectedPlace={selectedPlace}
                   onConfirmRemove={(id) => {
                     dispatch({ type: "REMOVE_PLACE", placeId: id });
                     removeUserPlace(id);
                     setSelectedPlace(null);
                   }}
-                  onResetFiltersAndSort={() => {
-                    setFilterState(INITIAL_FILTER_STATE);
-                    setSortState(INITIAL_SORT_STATE);
-                    localStorage.removeItem(FILTER_STORAGE_KEY);
-                    localStorage.removeItem(SORT_STORAGE_KEY);
-                  }}
-                  onToggleSort={(key) =>
-                    setSortState((prev) => {
-                      if (prev.key === key) {
-                        return {
-                          key,
-                          direction: prev.direction === "asc" ? "desc" : "asc",
-                        };
-                      }
-                      return { key, direction: "asc" };
-                    })
-                  }
-                  selectedPlace={selectedPlace}
                 />
               )}
 
-              <AvailablePlacesView />
+              <AvailablePlacesView
+                onSelectPlace={(place) => {
+                  dispatch({ type: "ADD_PLACE", place });
+                  addUserPlace(place);
+                }}
+              />
             </main>
           }
         />
