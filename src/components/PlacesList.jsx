@@ -10,9 +10,13 @@ export default function PlacesList({
   disabled,
   highlightedPlaceId,
 }) {
+  const uniquePlaces = Array.from(
+    new Map(places.map((place) => [place.id, place])).values(),
+  );
+
   return (
     <ul className="places">
-      {places.map((place) => (
+      {uniquePlaces.map((place) => (
         <PlaceItem
           key={place.id}
           place={place}
