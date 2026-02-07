@@ -206,6 +206,14 @@ export default function App() {
     return result;
   }, [placesState.userPlaces, filterState, sortState]);
 
+  function handleAddPlace(place) {
+    if (placesState.userPlaces.some((p) => p.id === place.id)) {
+      return;
+    }
+    dispatch({ type: "ADD_PLACE", place });
+    addUserPlace(place);
+  }
+
   return (
     <BrowserRouter>
       <header className="app-header">
@@ -276,8 +284,7 @@ export default function App() {
                 isReadOnly={!isAuthConfirmed}
                 onSelectPlace={(place) => {
                   if (!isAuthConfirmed) return;
-                  dispatch({ type: "ADD_PLACE", place });
-                  addUserPlace(place);
+                  handleAddPlace(place);
                 }}
               />
             </main>
