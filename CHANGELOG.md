@@ -8,7 +8,43 @@ The project follows an **incremental, feature-driven development approach**, whe
 
 ## [Unreleased]
 
-Ongoing work toward v1.0.
+No active changes.
+The project is currently stable and in deployment phase.
+
+---
+
+## [2.0.0] – Production-ready release
+
+### Added
+
+- Full backend persistence using SQLite
+- Deterministic frontend rendering with duplicate-safe logic
+- Comprehensive automated test coverage:
+  - Unit tests
+  - Integration tests
+  - End-to-end (Playwright) tests
+- Notes editor modal with backend persistence
+- Favorite and status toggle persistence
+- Safe delete confirmation flow
+- Verified production environment configuration
+- Backend production run support (`npm run start`)
+- PM2-based backend process management documentation
+- Finalized deployment documentation and checklist
+- GitHub release tagging
+
+### Changed
+
+- Backend architecture stabilized for production use
+- State management finalized with predictable reducer flow
+- Test runners fully isolated (Vitest vs Playwright)
+- Documentation aligned with final verified project state
+
+### Improved
+
+- Overall application stability and reliability
+- Deployment readiness and reproducibility
+- Developer confidence through full test coverage
+- Clear separation between development and production behavior
 
 ---
 
@@ -126,6 +162,6 @@ Ongoing work toward v1.0.
 
 - Each version represents a **clear development milestone**
 - Refactoring and cleanup are treated as first-class changes
-- The project is evolving toward a stable, production-ready v1.0
+- Version **2.0.0** marks the first fully tested, production-ready release
 
 ---
