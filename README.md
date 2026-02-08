@@ -240,6 +240,41 @@ The frontend and backend servers must be running simultaneously for the applicat
 
 ---
 
+## Backend Production Deployment (VPS / Node.js / PM2)
+
+### Production assumptions
+
+- Linux VPS or Linux server
+- Node.js and npm installed
+- PM2 installed globally
+- Backend runs on port 3000
+- Frontend communicates via configured API base URL
+
+### Install backend dependencies
+
+```bash
+cd backend
+npm install
+```
+
+### Start backend in production mode
+
+```bash
+npm run start
+```
+
+#### The backend listens on:
+
+http://localhost:3000
+
+### Run backend with PM2 (recommended)
+
+```bash
+pm2 start app.js --name place-picker-backend
+pm2 save
+pm2 startup
+```
+
 ## Verified Guarantees
 
 - No duplicate place creation (frontend & backend)
@@ -283,3 +318,7 @@ You can reach out via:
 ---
 
 ## This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+```
+
+```
