@@ -39,7 +39,7 @@ Edit Mode enables full place management functionality.
 
 **Screenshot file:**
 
-public/screenshots/01-app-start-edit-mode.png
+![App start and edit mode](public/screenshots/01-app-start-edit-mode.png)
 
 ### Add Places: Available → My Places
 
@@ -48,7 +48,7 @@ Duplicate additions are prevented on both frontend and backend.
 
 **Screenshot file:**
 
-public/screenshots/02-add-place-to-my-places.png
+![Add place to My Places](public/screenshots/02-add-place-to-my-places.png)
 
 ### Favorites & Status Toggle
 
@@ -61,7 +61,7 @@ Changes persist across reloads.
 
 **Screenshot file:**
 
-public/screenshots/03-favorite-and-status-toggle.png
+![Favorite and status toggle](public/screenshots/03-favorite-and-status-toggle.png)
 
 ### Notes Editor Modal
 
@@ -70,7 +70,7 @@ Notes are persisted using the backend SQLite database.
 
 **Screenshot file:**
 
-public/screenshots/04-notes-modal.png
+![Notes editor modal](public/screenshots/04-notes-modal.png)
 
 ### Safe Deletion with Confirmation
 
@@ -78,7 +78,7 @@ Places can be removed only after explicit confirmation, preventing accidental de
 
 **Screenshot file:**
 
-public/screenshots/05-delete-confirmation-modal.png
+![Delete confirmation modal](public/screenshots/05-delete-confirmation-modal.png)
 
 ---
 
@@ -282,4 +282,4 @@ You can reach out via:
 
 ---
 
-### This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+## This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
