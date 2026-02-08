@@ -1,10 +1,8 @@
-# Place Picker Planner
+# Place Picker Planner v2.0
 
-Place Picker Planner is a full-stack React application for selecting, saving, and organizing places that matter to you.
+A full-stack place management application with persistent storage, deterministic UI behavior, and comprehensive automated test coverage.
 
-The project is built as a **production-oriented, incrementally developed application** with a strict focus on stability, clarity, and long-term maintainability.
-
-## Current Version: v2.0 – Feature Expansion on Stable Baseline
+This is version 2.0, fully verified and deployment-ready.
 
 ## Demo
 
@@ -14,124 +12,129 @@ Live demo: https://place-picker-planner.netlify.app/
 
 ---
 
-## Project Status & Versioning
+## Project Status
 
-### v1.0 – Baseline (Completed)
+### Stable & Verified
 
-v1.0 established a complete, functional application with:
+#### Current Phase:
 
-- Full CRUD flow for places
-- Optimistic UI updates
-- Backend persistence using JSON files
-- Clear separation of concerns
-- Production-oriented architecture
+- STEP GROUP 5 – Deployment
 
-No new features were added without versioning.
-
-### v1.1 – Stabilization Phase (Completed)
-
-v1.1 focused on **internal safety, predictability, and UX polish**, without changing user-facing behavior.
-
-Key Improvements:
-
-- Safer optimistic update rollback
-- Backend sync reliability
-- Clearer empty and loading states
-- Accessibility improvements (ARIA roles, keyboard semantics)
-- Better modal and dialog behavior
-- Improved internal clarity and documentation
+No known regressions. No blocked tasks.
 
 ---
 
-### v2.0 – Feature Expansion (Current)
+## Key Features
 
-v2.0 builds **on top of the stable v1.x baseline**.
+### Frontend
 
-Core guarantees:
-
-- Backend API is stable and reliable
-- Persistence layer is complete
-- No regressions in core flow
-
-v2.0 introduces **controlled feature expansion**, UI enhancements, and improved data handling.
-
----
-
-## Current Feature Set (v2.0)
-
-### Core Flow
-
-- Available Places → My Places → Backend persistence
-- Optimistic UI updates
-- Duplicate-safe backend behavior
-- No API contract assumptions (plain arrays only)
-
-### My Places Features
-
-- Favorites toggle (synced with backend)
-- Status toggle (want to visit / visited)
-- Notes editor (modal)
-- Planned visit date
-- Delete with confirmation dialog
-- Email-based edit mode
-
-### Search, Filtering & Sorting
-
-- Text search
+- Add places from Available Places to My Places
+- Toggle Visited / Want to Visit status
+- Mark places as Favorites
+- Notes editor modal with persistence
 - Category filtering
-- Title sorting (A–Z / Z–A)
-- Multiple filters combined
-- Single transformation pipeline (filter → sort)
-- No mutation of original state
-- Reset filters / sorting
+- Multiple sorting modes
+- Search input
+- Deterministic rendering (no duplicate keys)
+- Fully responsive UI
+- Accessible modal and form interactions
 
-### UX & Reliability
+### Backend
 
-- Stable empty and “no results” states
-- Optimistic UI with safe rollback
-- Predictable modal behavior
-- Accessible controls and toggles
-- Responsive layout
+- SQLite persistence (app.db)
+- REST API with stable endpoints
+- Duplicate-safe add logic (backend no-op on duplicates)
+- JSON data bootstrap support
 
 ---
 
-## Backend Status (Stable)
+## Test Coverage
 
-Backend runs via:
+### Unit & Integration Tests (Vitest)
+
+#### Locations:
+
+- src/utils/api.test.js
+- src/utils/placeTransform.test.js
+- src/views/placesReducer.test.js
+- backend/app.integration.test.js
+
+#### Status
+
+- All tests passing
+- Isolated from E2E tests
+- No overlap with node_modules
+
+Run:
 
 ```bash
-node app.js
+npm run test
 ```
 
+---
+
+## End-to-End Tests (Playwright)
+
+#### Location:
+
+- src/tests/e2e/critical-paths.spec.js
+
+#### Covered flows:
+
+- App load & edit mode enable
+- Add place to My Places
+- Toggle favorite and status
+- Delete place with confirmation
+
+#### Status:
+
+- All tests passing
+- Duplicate-safe
+- Backend-dependent behavior verified
+
+Run:
+
+```bash
+npx playwright test
+```
 
 ---
 
-## Endpoints
+## Project Structure (Simplified)
 
-- GET /places
-- GET /user-places
-- POST /user-places
-- DELETE /user-places/:id
-- PATCH /user-places/:id
-- PATCH /user-places/:id/favorite
-- PATCH /user-places/:id/status
+```Place Picker v2-deployment
+├── backend
+│   ├── data
+│   │   ├── app.db
+│   │   ├── places.json
+│   │   └── user-places.json
+│   ├── app.js
+│   └── app.integration.test.js
+├── src
+│   ├── components
+│   ├── views
+│   ├── utils
+│   ├── tests/e2e
+│   └── App.jsx
+├── public
+├── playwright.config.js
+├── vite.config.js
+├── README.md
+└── package.json
+```
 
-## Storage
+## Environment Configuration
 
-- places.json – plain array
-- user-places.json – plain array
-- SQLite database introduced for persistence layer upgrade
+Two environments are supported:
 
-## Guarantees
+- .env.development
+- .env.production
 
-- No wrapped data structures
-- No backend crashes
-- Duplicate adds handled as no-op 200 OK
-- Static image serving via /images
+Backend uses SQLite and does not require external services.
 
 ---
 
-## Local Development Setup
+## Running the App
 
 To run the application locally, follow the steps below.
 
@@ -143,8 +146,7 @@ From the project root directory, install the required dependencies:
 npm install
 ```
 
-
-### 2. Start the frontend development server
+### 2. Start frontend
 
 After the installation is complete, start the Vite development server:
 
@@ -161,7 +163,7 @@ cd backend
 npm install
 ```
 
-### 4. Start the backend server
+### 4. Start backend
 
 From the backend folder, start the Node.js server:
 
@@ -173,126 +175,28 @@ The frontend and backend servers must be running simultaneously for the applicat
 
 ---
 
-## Environment Configuration (Development / Production)
+## Verified Guarantees
 
-The application uses **Vite environment variables** to separate development and production behavior without changing the codebase.
-
-### Environment Files
-
-The following files are defined in the project root:
-
-- `.env.development`
-- `.env.production`
-
-### Supported Variables
-
-| Variable                    | Description                                    |
-| --------------------------- | ---------------------------------------------- |
-| `VITE_API_BASE_URL`         | Backend API base URL                           |
-| `VITE_RESET_STATUS_ON_LOAD` | Controls whether place status is reset on load |
-| `VITE_DEBUG`                | Enables or disables development-only debugging |
+- No duplicate place creation (frontend & backend)
+- Filter → sort pipeline integrity preserved
+- Edit mode authentication stable
+- Header and auth flow consistent
+- Notes, favorites, and status fully persistent
+- Tests do not mutate application logic
 
 ---
 
-### Behavior Differences
+### Deployment Readiness
 
-**Development**
+All mandatory pre-deployment requirements are fulfilled:
 
-- Uses local backend
-- Resets place status on reload (optional)
-- Enables debug behavior
+- Test verification completed
+- No logic changes during test adaptation
+- Stable UI / UX
+- Deterministic rendering
+- Backend persistence verified
 
-##Production##
-
-- Uses production backend
-- Preserves backend state
-- No development-only logic
-
----
-
-## Tech Stack
-
-### Frontend
-
-- **React**
-- **Vite**
-- **JavaScript (ES6+)**
-- **CSS (modular)**
-
-### Backend
-
-- **Node.**
-- **Express**
-- **SQLite (current persistence layer)**
-- **JSON (legacy / transitional)**
-
----
-
-## Project Structure
-
-```PlacePicker/
-├── backend/
-│   ├── data/              # Persistence (SQLite + JSON)
-│   ├── images/            # Place images
-│   ├── app.js             # Backend entry point
-│   └── package.json
-├── public/
-├── src/
-│   ├── assets/            # Static assets
-│   ├── components/        # UI components
-│   ├── styles/            # Modular CSS
-│   ├── views/             # Page-level views
-│   ├── utils/             # API and helpers
-│   ├── App.jsx            # Root component
-│   ├── main.jsx           # Entry point
-│   └── index.css
-├── index.html
-├── vite.config.js
-└── package.json
-```
-
----
-
-### Development Principles
-
-- One logical change per commit
-- Strict version boundaries
-- Stable baseline first, features second
-- No speculative or demo-only code
-- Production-readiness over tutorials
-
----
-
-### Roadmap
-
-### v2.0 (Current)
-
-- Advanced filtering UX
-- Visual indicators for active filters
-- Optional persistence of UI preferences
-- Activity history tracking
-- UX refinement
-
-### v3.0 (Planned)
-
-- Authentication
-- True per-user data separation
-- Expanded testing infrastructure
-- Deployment hardening
-
----
-
-## Contributing / Support
-
-- Contributions are welcome. Feel free to open an issue or submit a pull request.
-- For problems or suggestions, please use GitHub issues.
-
----
-
-### Status
-
-Stable baseline maintained.
-Feature work is ongoing and safe.
+The project is safe to deploy.
 
 ---
 
@@ -312,7 +216,5 @@ You can reach out via:
 - Website: https://duskovokic.com
 
 ---
-
-## License
 
 ## This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
