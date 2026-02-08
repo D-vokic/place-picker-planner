@@ -209,7 +209,7 @@ The project is safe to deploy.
 
 ## Author
 
-This project is maintained by \*\*Dusko Vokic\*\*
+This project is maintained by **Dusko Vokic**
 You can reach out via:
 
 - GitHub: https://github.com/D-vokic
