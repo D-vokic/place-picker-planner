@@ -24,6 +24,64 @@ No known regressions. No blocked tasks.
 
 ---
 
+## Features Showcase
+
+Visual walkthrough of the core features and verified user flows in Place Picker Planner v2.0.
+
+All screenshots are stored in:
+
+/public/screenshots/
+
+### Application Start & Edit Mode
+
+Initial application state with clean layout and deterministic rendering.
+Edit Mode enables full place management functionality.
+
+**Screenshot file:**
+
+public/screenshots/01-app-start-edit-mode.png
+
+### Add Places: Available → My Places
+
+Places can be added from Available Places into My Places.
+Duplicate additions are prevented on both frontend and backend.
+
+**Screenshot file:**
+
+public/screenshots/02-add-place-to-my-places.png
+
+### Favorites & Status Toggle
+
+Each place supports:
+
+- Favorite toggle
+- Status toggle: Want to Visit / Visited
+
+Changes persist across reloads.
+
+**Screenshot file:**
+
+public/screenshots/03-favorite-and-status-toggle.png
+
+### Notes Editor Modal
+
+Each place includes a Notes modal for adding or editing personal notes.
+Notes are persisted using the backend SQLite database.
+
+**Screenshot file:**
+
+public/screenshots/04-notes-modal.png
+
+### Safe Deletion with Confirmation
+
+Places can be removed only after explicit confirmation, preventing accidental deletion.
+
+**Screenshot file:**
+
+public/screenshots/05-delete-confirmation-modal.png
+
+---
+
 ## Key Features
 
 ### Frontend
@@ -115,8 +173,15 @@ npx playwright test
 │   ├── views
 │   ├── utils
 │   ├── tests/e2e
-│   └── App.jsx
+│   ├── App.jsx
+│   └── main.jsx
 ├── public
+│   └── screenshots
+│       ├── 01-app-start-edit-mode.png
+│       ├── 02-add-place-to-my-places.png
+│       ├── 03-favorite-and-status-toggle.png
+│       ├── 04-notes-modal.png
+│       └── 05-delete-confirmation-modal.png
 ├── playwright.config.js
 ├── vite.config.js
 ├── README.md
@@ -209,7 +274,7 @@ The project is safe to deploy.
 
 ## Author
 
-This project is maintained by **Dusko Vokic**
+This project is maintained by \*\*Dusko Vokic\*\*
 You can reach out via:
 
 - GitHub: https://github.com/D-vokic
