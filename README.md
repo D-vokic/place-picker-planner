@@ -275,6 +275,8 @@ pm2 save
 pm2 startup
 ```
 
+---
+
 ## Verified Guarantees
 
 - No duplicate place creation (frontend & backend)
