@@ -38,7 +38,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
         const normalizedPlaces = data.places.map((place) => ({
           id: place.id,
           title: place.title,
-          imageUrl: `http://localhost:3000/images/${place.image.src}`,
+          imageUrl: `/images/${place.image.src}`,
           imageAlt: place.image.alt || place.title,
           city: place.city || "",
           category: place.category || "general",
